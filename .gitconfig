@@ -1,0 +1,16 @@
+[user]
+	email = aldochacon@gmail.com
+	name = Aldo W.
+
+[core]
+    editor = code -w
+
+[alias]
+    co = checkout
+    ci = commit
+    st = status
+    br = branch
+    hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
+
+[init]
+    defaultBranch = main
