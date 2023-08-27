@@ -1,0 +1,26 @@
+output HDMI-1
+off
+output DP-1
+off
+output HDMI-2
+off
+output HDMI-3
+off
+output DP-2
+off
+output DP-3
+off
+output VGA-1
+crtc 1
+mode 1440x900
+pos 0x0
+rate 59.89
+x-prop-non_desktop 0
+output LVDS-1
+crtc 0
+mode 1366x768
+pos 74x900
+primary
+rate 60.10
+x-prop-non_desktop 0
+x-prop-scaling_mode Full aspect

@@ -6,6 +6,6 @@
 
 nitrogen --restore &
 wal -R &
-picom --config ~/.config/picom/picom.conf &
+# picom --config ~/.config/picom/picom.conf &
 dunst &
 exec qtile start

@@ -1,0 +1,110 @@
+{
+	"[python]": {
+		"editor.formatOnType": true
+	},
+	"workbench.iconTheme": "material-icon-theme",
+	"editor.inlineSuggest.enabled": true,
+	"terminal.integrated.sendKeybindingsToShell": true,
+	"window.menuBarVisibility": "toggle",
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"editor.formatOnSave": true,
+	"prettier.enableDebugLogs": true,
+	"prettier.singleQuote": true,
+	"explorer.confirmDragAndDrop": false,
+	"github.copilot.enable": {
+		"*": false,
+		"plaintext": false,
+		"markdown": true,
+		"scminput": false,
+		"yaml": true,
+		"javascript": true
+	},
+	"[markdown]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"github.copilot.advanced": {
+		"secret_key": "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",
+		"enabled": true,
+		"showInContextMenu": true,
+		"showInStatusBar": true,
+		"showInEditor": true,
+		"showInEditorContextMenu": true,
+		"showInEditorHover": true,
+		"showInEditorTitle": true,
+		"showInEditorTitleContextMenu": true
+	},
+	"git.requireGitUserConfig": false,
+	"github.gitProtocol": "ssh",
+	"github.gitAuthentication": true,
+	"redhat.telemetry.enabled": false,
+	"[json]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"vsicons.dontShowNewVersionMessage": true,
+	"git.openRepositoryInParentFolders": "always",
+	"eslint.debug": true,
+	"eslint.problems.shortenToSingleLine": true,
+	"workbench.startupEditor": "none",
+	"explorer.confirmDelete": false,
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"[yaml]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"editor.stickyScroll.enabled": true,
+	"editor.largeFileOptimizations": false,
+	"editor.inlayHints.enabled": "off",
+	"editor.wordWrap": "off",
+	"diffEditor.wordWrap": "off",
+	"editor.guides.indentation": false,
+	"editor.guides.bracketPairs": false,
+	"workbench.colorTheme": "Black Italic",
+	"terminal.integrated.defaultProfile.linux": "zsh",
+	"githubPullRequests.pushBranch": "always",
+	"git.autofetch": true,
+	"thunder-client.requestLayout": "Top/Bottom",
+	"editor.unicodeHighlight.invisibleCharacters": false,
+	"editor.unicodeHighlight.ambiguousCharacters": false,
+	"json.maxItemsComputed": 8000,
+	"editor.autoClosingBrackets": "never",
+	"editor.autoClosingQuotes": "never",
+	"xml.completion.autoCloseTags": false,
+	"yaml.schemas": {
+		"file:///home/crystal/.vscode/extensions/atlassian.atlascode-3.0.3/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml"
+	},
+	"editor.tabSize": 2,
+	"githubPullRequests.pullBranch": "never",
+	"terminal.integrated.cursorBlinking": true,
+	"terminal.integrated.shellIntegration.history": 1000,
+	"debug.console.wordWrap": false,
+	"editor.minimap.renderCharacters": false,
+	"[typescript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
+	},
+	"editor.selectionClipboard": false,
+	"window.openFilesInNewWindow": "on",
+	"prettier.useTabs": true,
+	"files.associations": {
+		"*.ts": "typescriptreact"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"workbench.editor.scrollToSwitchTabs": true,
+	"window.autoDetectColorScheme": true,
+	"workbench.editor.pinnedTabSizing": "shrink",
+	"workbench.editor.tabSizing": "shrink",
+	"workbench.editor.highlightModifiedTabs": true,
+	"workbench.editor.openPositioning": "last",
+	"workbench.editor.centeredLayoutFixedWidth": true,
+	"svg.preview.mode": "svg",
+	"git.openDiffOnClick": false,
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"extensions.ignoreRecommendations": true
+}

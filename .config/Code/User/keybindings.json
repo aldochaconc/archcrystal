@@ -1,0 +1,45 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+	{
+		"key": "alt+`",
+		"command": "editor.toggleFold",
+		"when": "editorTextFocus && foldingEnabled"
+	},
+	{
+		"key": "ctrl+k ctrl+l",
+		"command": "-editor.toggleFold",
+		"when": "editorTextFocus && foldingEnabled"
+	},
+	{
+		"key": "shift+delete",
+		"command": "-deleteFile",
+		"when": "filesExplorerFocus && foldersViewVisible && !explorerResourceReadonly && !inputFocus"
+	},
+	{
+		"key": "alt+d",
+		"command": "editor.action.deleteLines",
+		"when": "textInputFocus && !editorReadonly"
+	},
+	{
+		"key": "alt+tab",
+		"command": "workbench.action.toggleEditorGroupLayout"
+	},
+	{
+		"key": "shift+alt+0",
+		"command": "-workbench.action.toggleEditorGroupLayout"
+	},
+	{
+		"key": "alt+r",
+		"command": "-workbench.action.terminal.toggleFindRegex",
+		"when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+	},
+	{
+		"key": "ctrl+k ctrl+t",
+		"command": "-workbench.action.selectTheme"
+	},
+	{
+		"key": "ctrl+shift+i",
+		"command": "-instant-documentation.openPreview",
+		"when": "!notebookEditorFocused && editorLangId == 'typescript' || !notebookEditorFocused && resourceLangId == 'javascript' || !notebookEditorFocused && resourceLangId == 'javascriptreact' || !notebookEditorFocused && resourceLangId == 'typescriptreact'"
+	}
+]

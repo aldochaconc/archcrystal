@@ -22,7 +22,7 @@ keys = [
     Key([mod], "t", lazy.window.toggle_floating()),
     Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
-    Key([mod], "space",  lazy.widget["keyboardlayout"].next_keyboard()),
+    # Key([mod], "space",  lazy.widget["keyboardlayout"].next_keyboard()),
     Key([mod, "shift"], "Return", lazy.layout.toggle_split(), desc="Toggle view",),
     Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move to the left"),
     Key([mod, "shift"], "l", lazy.layout.shuffle_right(), desc="Move to the right"),
@@ -42,7 +42,7 @@ keys = [
 
 ]
 
-groups = [Group(i) for i in "123456"]
+groups = [Group(i) for i in "1234"]
 
 for i in groups:
     keys.extend(
@@ -107,17 +107,17 @@ screens = [
                     format="network/{down} ↓↑{up}",
                     disconnected_message="No Wifi",
                 ),
-                widget.Bluetooth(
-                    hci='/dev_14_85_09_C2_4C_F3',
-                    fmt='bt/{}',
-                ),
+                # widget.Bluetooth(
+                #     hci='/dev_14_85_09_C2_4C_F3',
+                #     fmt='bt/{}',
+                # ),
                 widget.Volume(
-                    device="pulse",
                     fmt="vol/{}",
                 ),
                 widget.KeyboardLayout(
-                    configured_keyboards=['us', 'es'],
-                    display_map={'us': 'xbk/US', 'es': 'xbk/ES'},
+                    configured_keyboards=['us', 'es', 'jp'],
+                    display_map={'us': 'xbk/US',
+                                 'es': 'xbk/ES', 'jp': 'xbk/JP'},
                 ),
                 widget.Battery(
                     energy_now_file='charge_now',
@@ -164,6 +164,8 @@ floating_layout = layout.Floating(
         Match(title="Nitrogen"),  # GPG key password entry
     ]
 )
+
+os.system('ibus-daemon -drx')
 auto_fullscreen = True
 focus_on_window_activation = "smart"
 reconfigure_screens = True

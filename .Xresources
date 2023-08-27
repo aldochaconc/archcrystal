@@ -13,3 +13,5 @@ URxvt.scrollBar: false
 URxvt.scrollBar_right: false
 URxvt.urgentOnBell: true
 URxvt.depth: 24
+urxvt*transparent: true
+urxvt*shading: 15
