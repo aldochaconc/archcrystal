@@ -2,12 +2,7 @@
 # Arch Linux installer script. EFI only!
 
 
-# Check if chroot_commands.sh exists in the current directory.
-if [ ! -f chroot_commands.sh ]; then
-    echo "Error: chroot_commands.sh not found in the current directory."
-    echo "Please ensure chroot_commands.sh is in the same directory as this script."
-    exit 1
-fi
+
 
 [ -z "$1" ] && printf "Usage: Provide only the drive to install to (i.e /dev/sda, see lsblk)\n\n./archstrap.sh [DRIVE]\n\n" && exit
 [ ! -b "$1" ] && printf "Drive $1 is not a valid block device.\n" && exit
@@ -91,12 +86,25 @@ mkdir -p /mnt/boot
 mount $boot /mnt/boot
 swapon $swap
 
+# Check if chroot_commands.sh exists and is executable
+if [ ! -f ./chroot_commands.sh ] || [ ! -x ./chroot_commands.sh ]; then
+    echo "chroot_commands.sh does not exist or is not executable"
+    exit 1
+fi
+
 # Enable parallel downloads in pacman.
 sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf || echo "ParallelDownloads = 5" >> /etc/pacman.conf
 
 # Packages and chroot.
 pacstrap /mnt linux linux-firmware networkmanager vim base base-devel git man efibootmgr grub
 genfstab -U /mnt > /mnt/etc/fstab
+
+# Check if chroot_commands.sh exists and is executable in the new system
+if [ ! -f /mnt/chroot_commands.sh ] || [ ! -x /mnt/chroot_commands.sh ]; then
+    echo "chroot_commands.sh does not exist or is not executable in the new system"
+    echo "Please copy chroot_commands.sh to the new system and make it executable, then run this script again."
+    exit 1
+fi
 
 # Enter the system and set up basic locale, passwords and bootloader.
 arch-chroot /mnt ./chroot_commands.sh
