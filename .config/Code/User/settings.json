@@ -28,7 +28,7 @@
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"github.copilot.advanced": {
-		"secret_key": "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",
+		"secret_key": "",
 		"enabled": true,
 		"showInContextMenu": true,
 		"showInStatusBar": true,
