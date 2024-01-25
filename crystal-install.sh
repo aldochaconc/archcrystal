@@ -1,9 +1,6 @@
 #!/bin/sh
 # Arch Linux installer script. EFI only!
 
-
-
-
 [ -z "$1" ] && printf "Usage: Provide only the drive to install to (i.e /dev/sda, see lsblk)\n\n./archstrap.sh [DRIVE]\n\n" && exit
 [ ! -b "$1" ] && printf "Drive $1 is not a valid block device.\n" && exit
 printf "\nThis script will erase all data on $1.\nAre you certain? (y/n): " && read CERTAIN
@@ -86,12 +83,6 @@ mkdir -p /mnt/boot
 mount $boot /mnt/boot
 swapon $swap
 
-# Check if chroot_commands.sh exists and is executable
-if [ ! -f ./chroot_commands.sh ] || [ ! -x ./chroot_commands.sh ]; then
-    echo "chroot_commands.sh does not exist or is not executable"
-    exit 1
-fi
-
 # Enable parallel downloads in pacman.
 sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf || echo "ParallelDownloads = 5" >> /etc/pacman.conf
 
@@ -99,15 +90,41 @@ sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf || ech
 pacstrap /mnt linux linux-firmware networkmanager vim base base-devel git man efibootmgr grub
 genfstab -U /mnt > /mnt/etc/fstab
 
-# Check if chroot_commands.sh exists and is executable in the new system
-if [ ! -f /mnt/chroot_commands.sh ] || [ ! -x /mnt/chroot_commands.sh ]; then
-    echo "chroot_commands.sh does not exist or is not executable in the new system"
-    echo "Please copy chroot_commands.sh to the new system and make it executable, then run this script again."
-    exit 1
-fi
-
 # Enter the system and set up basic locale, passwords and bootloader.
-arch-chroot /mnt ./chroot_commands.sh
+arch-chroot /mnt sh -c "set -xe"
+
+sed -i "s/^#en_US.UTF-8/en_US.UTF-8/g" /etc/locale.gen
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
+locale-gen
+
+# Set the timezone to Santiago, Chile.
+ln -sf /usr/share/zoneinfo/America/Santiago /etc/localtime
+hwclock --systohc
+
+# Set the keyboard layout to English/Japanese.
+localectl set-keymap jp106
+
+systemctl enable NetworkManager
+
+# Set the root password.
+echo "root:$root_password" | chpasswd
+
+# Create the second user and set their password.
+useradd -m -G wheel -s /bin/bash $username
+echo "$username:$user_password" | chpasswd
+
+# Uncomment the line in the sudoers file that allows members of the wheel group to use sudo.
+sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
+
+# Set the hostname.
+echo "$hostname" > /etc/hostname
+
+# Enable parallel downloads in pacman.
+sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf || echo "ParallelDownloads = 5" >> /etc/pacman.conf
+
+mkdir /boot/grub
+grub-mkconfig -o /boot/grub/grub.cfg
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 
 # Finalize.
 umount -R /mnt
