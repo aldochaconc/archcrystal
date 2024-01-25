@@ -10,32 +10,31 @@ disk=$1
 boot=${disk}1
 swap=${disk}2
 root=${disk}3
-home=${disk}4
 
 # Cleanup from previous runs.
-swapoff $swap
-umount -R /mnt
+if swapon --summary | grep -q "$swap"; then
+    swapoff $swap
+fi
+umount -R /mnt || true
 
-# Partition 512 MiB for boot, 12G for swap, 50G for root and rest to home.
+# Partition 1GB for boot, 3GB for swap, rest for root.
 # Optimal alignment will change the exact size though!
 set -xe
 parted -s $disk mklabel gpt
-parted -sa optimal $disk mkpart primary fat32 0% 512MiB
-parted -sa optimal $disk mkpart primary linux-swap 512MiB 15G
-parted -sa optimal $disk mkpart primary ext4 15G 70G
-parted -sa optimal $disk mkpart primary ext4 70G 100%
+parted -sa optimal $disk mkpart primary fat32 0% 1GB
+parted -sa optimal $disk mkpart primary linux-swap 1GB 4GB
+parted -sa optimal $disk mkpart primary ext4 4GB 100%
 parted -s $disk set 1 esp on
 
 # Format the partitions.
 mkfs.fat -IF32 $boot
 mkswap -f $swap
 mkfs.ext4 -F $root
-mkfs.ext4 -F $home
 
 # Mount the partitions.
 mount $root /mnt
-mount -m $boot /mnt/boot
-mount -m $home /mnt/home
+mkdir -p /mnt/boot
+mount $boot /mnt/boot
 swapon $swap
 
 # Packages and chroot.
@@ -43,21 +42,7 @@ pacstrap /mnt linux linux-firmware networkmanager vim base base-devel git man ef
 genfstab -U /mnt > /mnt/etc/fstab
 
 # Enter the system and set up basic locale, passwords and bootloader.
-arch-chroot /mnt sh -c 'set -xe;
-sed -i "s/^#en_US.UTF-8/en_US.UTF-8/g" /etc/locale.gen;
-echo "LANG=en_US.UTF-8" > /etc/locale.conf;
-locale-gen;
-
-ln -sf /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime;
-hwclock --systohc;
-systemctl enable NetworkManager;
-
-echo root:123 | chpasswd;
-echo "archer" > /etc/hostname;
-
-mkdir /boot/grub;
-grub-mkconfig -o /boot/grub/grub.cfg;
-grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB;'
+arch-chroot /mnt ./chroot_commands.sh
 
 # Finalize.
 umount -R /mnt
