@@ -63,19 +63,19 @@ if swapon --summary | grep -q "$swap"; then
 fi
 umount -R /mnt || true
 
-# Partition 1GB for boot, 3GB for swap, rest for root.
-# Optimal alignment will change the exact size though!
-set -xe
-parted -s $disk mklabel gpt
-parted -sa optimal $disk mkpart primary fat32 0% 1GB
-parted -sa optimal $disk mkpart primary linux-swap 1GB 4GB
-parted -sa optimal $disk mkpart primary ext4 4GB 100%
-parted -s $disk set 1 esp on
+# # Partition 1GB for boot, 3GB for swap, rest for root.
+# # Optimal alignment will change the exact size though!
+# set -xe
+# parted -s $disk mklabel gpt
+# parted -sa optimal $disk mkpart primary fat32 0% 1GB
+# parted -sa optimal $disk mkpart primary linux-swap 1GB 4GB
+# parted -sa optimal $disk mkpart primary ext4 4GB 100%
+# parted -s $disk set 1 esp on
 
-# Format the partitions.
-mkfs.fat -IF32 $boot
-mkswap -f $swap
-mkfs.ext4 -F $root
+# # Format the partitions.
+# mkfs.fat -IF32 $boot
+# mkswap -f $swap
+# mkfs.ext4 -F $root
 
 # Mount the partitions.
 mount $root /mnt
