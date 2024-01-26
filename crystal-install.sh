@@ -86,9 +86,9 @@ swapon $swap
 # Enable parallel downloads in pacman.
 sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf || echo "ParallelDownloads = 5" >> /etc/pacman.conf
 
-# Packages and chroot.
-pacstrap /mnt linux linux-firmware networkmanager vim base base-devel git man efibootmgr grub
-genfstab -U /mnt > /mnt/etc/fstab
+# # Packages and chroot.
+# pacstrap /mnt linux linux-firmware networkmanager vim base base-devel git man efibootmgr grub
+# genfstab -U /mnt > /mnt/etc/fstab
 
 # Enter the system and set up basic locale, passwords and bootloader.
 arch-chroot /mnt sh -c "set -xe"
