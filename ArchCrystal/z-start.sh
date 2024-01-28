@@ -9,6 +9,7 @@ source $BASE_DIR/x-setup.conf
 # (bash $BASE_DIR/0-preinstall.sh) |& tee 0-preinstall.log
 cat $BASE_DIR/x-setup.conf
 
+mkdir -p /mnt/root/ArchCrystal
 cp ${BASE_DIR}/x-setup.conf /mnt/root/ArchCrystal/x-setup.conf
 cp ${BASE_DIR}/1-setup.sh /mnt/root/ArchCrystal/1-setup.sh
 cp ${BASE_DIR}/2-user.sh /mnt/root/ArchCrystal/2-user.sh
