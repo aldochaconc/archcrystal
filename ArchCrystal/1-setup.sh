@@ -6,7 +6,7 @@ echo -ne "
                         SCRIPTHOME: ArchCrystal
 -------------------------------------------------------------------------
 "
-source $HOME/ArchCrystal/setup.conf
+source $HOME/ArchCrystal/x-setup.conf
 echo -ne "
 -------------------------------------------------------------------------
                     Network Setup 
@@ -106,7 +106,7 @@ elif grep -E "Intel Corporation UHD" <<<${gpu_type}; then
     pacman -S --needed --noconfirm libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 fi
 #SETUP IS WRONG THIS IS RUN
-if ! source $HOME/ArchCrystal/setup.conf; then
+if ! source $HOME/ArchCrystal/x-setup.conf; then
     # Loop through user input until the user gives a valid username
     while true; do
         read -p "Please enter username:" username
@@ -118,11 +118,11 @@ if ! source $HOME/ArchCrystal/setup.conf; then
         echo "Incorrect username."
     done
     # convert name to lowercase before saving to setup.conf
-    echo "username=${username,,}" >>${HOME}/ArchCrystal/setup.conf
+    echo "username=${username,,}" >>${HOME}/ArchCrystal/x-setup.conf
 
     #Set Password
     read -p "Please enter password:" password
-    echo "password=${password,,}" >>${HOME}/ArchCrystal/setup.conf
+    echo "password=${password,,}" >>${HOME}/ArchCrystal/x-setup.conf
 
     # Loop through user input until the user gives a valid hostname, but allow the user to force save
     while true; do
@@ -138,7 +138,7 @@ if ! source $HOME/ArchCrystal/setup.conf; then
         fi
     done
 
-    echo "NAME_OF_MACHINE=${name_of_machine,,}" >>${HOME}/ArchCrystal/setup.conf
+    echo "NAME_OF_MACHINE=${name_of_machine,,}" >>${HOME}/ArchCrystal/x-setup.conf
 fi
 echo -ne "
 -------------------------------------------------------------------------

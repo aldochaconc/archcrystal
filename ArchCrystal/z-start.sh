@@ -4,6 +4,8 @@ set -a
 BASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 set +a
 
+echo $BASE_DIR
+
 (bash $BASE_DIR/y-environment.sh) |& tee startup.log
 source $BASE_DIR/x-setup.conf
 (bash $BASE_DIR/0-preinstall.sh) |& tee 0-preinstall.log
