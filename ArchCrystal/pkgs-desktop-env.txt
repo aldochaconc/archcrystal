@@ -1,0 +1,6 @@
+i3-gaps
+i3blocks
+i3blocks
+numlockx
+dmenu
+rxvt-unicode
