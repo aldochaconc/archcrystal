@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck source=/dev/null
+
 echo -ne "
 -------------------------------------------------------------------------
                     0 - Pre-Install
@@ -7,11 +7,11 @@ echo -ne "
 
 Setting up mirrors for optimal download
 "
-source $BASE_DIR/x-setup.conf
+source $BASE_DIR/setup.conf
 iso=$(curl -4 ifconfig.co/country-iso)
 timedatectl set-ntp true
 pacman -S --noconfirm archlinux-keyring #update keyrings to latest to prevent packages failing to install
-pacman -S --noconfirm --needed pacman-contrib terminus-font
+pacman -S --noconfirm --needed pacman-contrib
 setfont ter-v22b
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 pacman -S --noconfirm --needed reflector rsync grub
@@ -34,6 +34,7 @@ echo -ne "
                     Formating Disk
 -------------------------------------------------------------------------
 "
+
 umount -A --recursive /mnt # make sure everything is unmounted before we start
 # disk prep
 sgdisk -Z ${DISK}         # zap all on disk
@@ -65,10 +66,10 @@ createsubvolumes() {
 
 # @description Mount all btrfs subvolumes after root has been mounted.
 mountallsubvol() {
-    mount -o "${MOUNT_OPTIONS}",subvol=@home "${partition3}" /mnt/home
-    mount -o "${MOUNT_OPTIONS}",subvol=@tmp "${partition3}" /mnt/tmp
-    mount -o "${MOUNT_OPTIONS}",subvol=@var "${partition3}" /mnt/var
-    mount -o "${MOUNT_OPTIONS}",subvol=@.snapshots "${partition3}" /mnt/.snapshots
+    mount -o ${MOUNT_OPTIONS},subvol=@home ${partition3} /mnt/home
+    mount -o ${MOUNT_OPTIONS},subvol=@tmp ${partition3} /mnt/tmp
+    mount -o ${MOUNT_OPTIONS},subvol=@var ${partition3} /mnt/var
+    mount -o ${MOUNT_OPTIONS},subvol=@.snapshots ${partition3} /mnt/.snapshots
 }
 
 # @description BTRFS subvolulme creation and mounting.
@@ -78,7 +79,7 @@ subvolumesetup() {
     # unmount root to remount with subvolume
     umount /mnt
     # mount @ subvolume
-    mount -o "${MOUNT_OPTIONS}",subvol=@ "${partition3}" /mnt
+    mount -o ${MOUNT_OPTIONS},subvol=@ ${partition3} /mnt
     # make directories home, .snapshots, var, tmp
     mkdir -p /mnt/{home,var,tmp,.snapshots}
     # mount subvolumes
@@ -93,9 +94,10 @@ else
     partition3=${DISK}3
 fi
 
-mkfs.vfat -F32 -n "EFIBOOT" "${partition2}"
-mkfs.ext4 -L ROOT "${partition3}"
-mount -t ext4 "${partition3}" /mnt
+# make filesystems EXT4 for / and FAT32 for /boot/efi
+mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
+mkfs.ext4 -L ROOT ${partition3}
+mount -t ext4 ${partition3} /mnt
 
 # mount target
 mkdir -p /mnt/boot/efi
@@ -114,14 +116,12 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 pacstrap /mnt base base-devel linux linux-firmware vim nano sudo archlinux-keyring wget libnewt --noconfirm --needed
-cp "${BASE_DIR}"/x-setup.conf /mnt/root/ArchCrystal/x-setup.conf
-cp "${BASE_DIR}"/1-setup.sh /mnt/root/ArchCrystal/1-setup.sh
-cp "${BASE_DIR}"/2-user.sh /mnt/root/ArchCrystal/2-user.sh
-cp "${BASE_DIR}"/3-post-setup.sh /mnt/root/ArchCrystal/3-post-setup.sh
+
+cp -R ${BASE_DIR} /mnt/root/archcrystal
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
 genfstab -L /mnt >>/mnt/etc/fstab
-echo " 
+echo "
   Generated /etc/fstab:
 "
 cat /mnt/etc/fstab
@@ -135,26 +135,3 @@ if [[ ! -d "/sys/firmware/efi" ]]; then
 else
     pacstrap /mnt efibootmgr --noconfirm --needed
 fi
-echo -ne "
--------------------------------------------------------------------------
-                    Checking for low memory systems <8G
--------------------------------------------------------------------------
-"
-TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
-if [[ $TOTAL_MEM -lt 8000000 ]]; then
-    # Put swap into the actual system, not into RAM disk, otherwise there is no point in it, it'll cache RAM into RAM. So, /mnt/ everything.
-    mkdir -p /mnt/opt/swap  # make a dir that we can apply NOCOW to to make it btrfs-friendly.
-    chattr +C /mnt/opt/swap # apply NOCOW, btrfs needs that.
-    dd if=/dev/zero of=/mnt/opt/swap/swapfile bs=1M count=2048 status=progress
-    chmod 600 /mnt/opt/swap/swapfile # set permissions.
-    chown root /mnt/opt/swap/swapfile
-    mkswap /mnt/opt/swap/swapfile
-    swapon /mnt/opt/swap/swapfile
-    # The line below is written to /mnt/ but doesn't contain /mnt/, since it's just / for the system itself.
-    echo "/opt/swap/swapfile	none	swap	sw	0	0" >>/mnt/etc/fstab # Add swap to fstab, so it KEEPS working after installation.
-fi
-echo -ne "
--------------------------------------------------------------------------
-                    SYSTEM READY FOR 1-setup.sh
--------------------------------------------------------------------------
-"
