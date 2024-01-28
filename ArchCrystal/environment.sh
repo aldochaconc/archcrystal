@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CONFIG_FILE=$BASE_DIR/x-setup.conf
+CONFIG_FILE=$BASE_DIR/setup.conf
 if [ ! -f "$CONFIG_FILE" ]; then # check if file exists
   touch -f "$CONFIG_FILE"        # create file if not exists
 fi

@@ -8,7 +8,7 @@ echo -ne "
 Final Setup and Configurations
 GRUB EFI Bootloader Install & Check
 "
-source ${HOME}/ArchCrystal/x-setup.conf
+source ${HOME}/setup.conf
 
 if [[ -d "/sys/firmware/efi" ]]; then
   grub-install --efi-directory=/boot ${DISK}
@@ -50,9 +50,6 @@ sed -i 's/^%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: A
 # Add sudo rights
 sed -i 's/^# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
 sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
-
-rm -r $HOME/ArchCrystal
-rm -r /home/$USERNAME/ArchCrystal
 
 # Replace in the same state
 cd $pwd

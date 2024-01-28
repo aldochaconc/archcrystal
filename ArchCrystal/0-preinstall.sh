@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# shellcheck source=/dev/null
 echo -ne "
 -------------------------------------------------------------------------
                     0 - Pre-Install
@@ -7,11 +6,11 @@ echo -ne "
 
 Setting up mirrors for optimal download
 "
-source $BASE_DIR/x-setup.conf
+source $BASE_DIR/setup.conf
 iso=$(curl -4 ifconfig.co/country-iso)
 timedatectl set-ntp true
 pacman -S --noconfirm archlinux-keyring #update keyrings to latest to prevent packages failing to install
-pacman -S --noconfirm --needed pacman-contrib terminus-font
+pacman -S --noconfirm --needed pacman-contrib
 setfont ter-v22b
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 pacman -S --noconfirm --needed reflector rsync grub
@@ -115,11 +114,8 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 pacstrap /mnt base base-devel linux linux-firmware vim nano sudo archlinux-keyring wget libnewt --noconfirm --needed
-mkdir -p /mnt/root/ArchCrystal
-cp ${BASE_DIR}/x-setup.conf /mnt/root/ArchCrystal/x-setup.conf
-cp ${BASE_DIR}/1-setup.sh /mnt/root/ArchCrystal/1-setup.sh
-cp ${BASE_DIR}/2-user.sh /mnt/root/ArchCrystal/2-user.sh
-cp ${BASE_DIR}/3-post-setup.sh /mnt/root/ArchCrystal/3-post-setup.sh
+mkdir -p /mnt/root
+cp -R ${BASE_DIR}/ /mnt/root/
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
 genfstab -L /mnt >>/mnt/etc/fstab

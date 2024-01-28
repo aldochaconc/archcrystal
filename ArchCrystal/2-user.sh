@@ -10,20 +10,12 @@ echo -ne "
 
 Installing AUR Softwares
 "
-source $HOME/ArchCrystal/x-setup.conf
-
-# TODO: REMOVE ZSH TITUS CONFIG
-cd ~
-mkdir "/home/$USERNAME/.cache"
-touch "/home/$USERNAME/.cache/zshhistory"
-git clone "https://github.com/ChrisTitusTech/zsh"
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-ln -s "~/zsh/.zshrc" ~/.zshrc
+source $HOME/setup.conf
 
 while read line; do
   echo "INSTALLING: ${line}"
   sudo pacman -S --noconfirm --needed ${line}
-done <~/ArchCrystal/pkgs-desktop-env.txt
+done <~${HOME}/pkgs-desktop-env.txt
 
 cd ~
 git clone "https://aur.archlinux.org/yay.git"
@@ -34,12 +26,12 @@ makepkg -si --noconfirm
 while read line; do
   echo "INSTALLING: ${line}"
   sudo pacman -S --noconfirm --needed ${line}
-done <~/ArchCrystal/pkgs-yay.txt
+done <~${HOME}/pkgs-yay.txt
 
 while read line; do
   echo "INSTALLING: ${line}"
   sudo pacman -S --noconfirm --needed ${line}
-done <~/ArchCrystal/pkgs-fonts.txt
+done <~${HOME}/pkgs-fonts.txt
 
 export PATH=$PATH:~/.local/bin
 
