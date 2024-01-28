@@ -115,8 +115,7 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 pacstrap /mnt base base-devel linux linux-firmware vim nano sudo archlinux-keyring wget libnewt --noconfirm --needed
-mkdir -p /mnt/root
-cp -R ${BASE_DIR}/* /mnt/root/
+cp -R ${BASE_DIR}/* /mnt/home/${USERNAME}
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
 genfstab -L /mnt >>/mnt/etc/fstab
