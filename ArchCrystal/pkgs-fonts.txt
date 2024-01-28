@@ -1,0 +1,13 @@
+
+awesome-terminal-fonts
+noto-fonts
+noto-fonts-emoji
+powerline-fonts
+terminus-font
+ttf-dejavu
+ttf-droid
+ttf-freefont
+ttf-hack
+ttf-liberation
+ttf-roboto
+ttf-ubuntu-font-family
