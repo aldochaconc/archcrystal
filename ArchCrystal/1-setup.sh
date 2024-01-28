@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck source=/dev/null
+
 echo -ne "
 -------------------------------------------------------------------------
                     Automated Arch Linux Installer
@@ -69,7 +69,7 @@ echo -ne "
 while read line; do
     echo "INSTALLING: ${line}"
     sudo pacman -S --noconfirm --needed ${line}
-done <~${HOME}/pkgs-base.txt
+done <~$HOME/pkgs-base.txt
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -154,8 +154,8 @@ if [ $(whoami) = "root" ]; then
     echo "$USERNAME:$PASSWORD" | chpasswd
     echo "$USERNAME password set"
 
-    cp -R $HOME/ArchCrystal /home/$USERNAME/
-    chown -R $USERNAME: /home/
+    cp -R $HOME/* /home/$USERNAME/
+    chown -R $USERNAME: /home/*
     echo "ArchCrystal copied to home directory"
 
     # enter $NAME_OF_MACHINE to /etc/hostname
