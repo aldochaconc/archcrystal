@@ -34,6 +34,7 @@ echo -ne "
                     Formating Disk
 -------------------------------------------------------------------------
 "
+
 umount -A --recursive /mnt # make sure everything is unmounted before we start
 # disk prep
 sgdisk -Z ${DISK}         # zap all on disk
@@ -65,10 +66,10 @@ createsubvolumes() {
 
 # @description Mount all btrfs subvolumes after root has been mounted.
 mountallsubvol() {
-    mount -o "${MOUNT_OPTIONS}",subvol=@home "${partition3}" /mnt/home
-    mount -o "${MOUNT_OPTIONS}",subvol=@tmp "${partition3}" /mnt/tmp
-    mount -o "${MOUNT_OPTIONS}",subvol=@var "${partition3}" /mnt/var
-    mount -o "${MOUNT_OPTIONS}",subvol=@.snapshots "${partition3}" /mnt/.snapshots
+    mount -o ${MOUNT_OPTIONS},subvol=@home ${partition3} /mnt/home
+    mount -o ${MOUNT_OPTIONS},subvol=@tmp ${partition3} /mnt/tmp
+    mount -o ${MOUNT_OPTIONS},subvol=@var ${partition3} /mnt/var
+    mount -o ${MOUNT_OPTIONS},subvol=@.snapshots ${partition3} /mnt/.snapshots
 }
 
 # @description BTRFS subvolulme creation and mounting.
@@ -78,7 +79,7 @@ subvolumesetup() {
     # unmount root to remount with subvolume
     umount /mnt
     # mount @ subvolume
-    mount -o "${MOUNT_OPTIONS}",subvol=@ "${partition3}" /mnt
+    mount -o ${MOUNT_OPTIONS},subvol=@ ${partition3} /mnt
     # make directories home, .snapshots, var, tmp
     mkdir -p /mnt/{home,var,tmp,.snapshots}
     # mount subvolumes
@@ -93,9 +94,9 @@ else
     partition3=${DISK}3
 fi
 
-mkfs.vfat -F32 -n "EFIBOOT" "${partition2}"
-mkfs.ext4 -L ROOT "${partition3}"
-mount -t ext4 "${partition3}" /mnt
+mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
+mkfs.ext4 -L ROOT ${partition3}
+mount -t ext4 ${partition3} /mnt
 
 # mount target
 mkdir -p /mnt/boot/efi
@@ -114,11 +115,11 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 pacstrap /mnt base base-devel linux linux-firmware vim nano sudo archlinux-keyring wget libnewt --noconfirm --needed
-cp "${BASE_DIR}"/x-setup.conf /mnt/root/ArchCrystal/x-setup.conf
-cp "${BASE_DIR}"/1-setup.sh /mnt/root/ArchCrystal/1-setup.sh
-cp "${BASE_DIR}"/2-user.sh /mnt/root/ArchCrystal/2-user.sh
-cp "${BASE_DIR}"/3-post-setup.sh /mnt/root/ArchCrystal/3-post-setup.sh
-cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
+# cp ${BASE_DIR}/x-setup.conf /mnt/root/ArchCrystal/x-setup.conf
+# cp ${BASE_DIR}/1-setup.sh /mnt/root/ArchCrystal/1-setup.sh
+# cp ${BASE_DIR}/2-user.sh /mnt/root/ArchCrystal/2-user.sh
+# cp ${BASE_DIR}/3-post-setup.sh /mnt/root/ArchCrystal/3-post-setup.sh
+# cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
 genfstab -L /mnt >>/mnt/etc/fstab
 echo " 
