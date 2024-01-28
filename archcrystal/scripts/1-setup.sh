@@ -3,10 +3,10 @@
 echo -ne "
 -------------------------------------------------------------------------
                     Automated Arch Linux Installer
-                        SCRIPTHOME: ArchCrystal
+                        SCRIPTHOME: archcrystal
 -------------------------------------------------------------------------
 "
-source $HOME/setup.conf
+source $HOME/archcrystal/setup.conf
 echo -ne "
 -------------------------------------------------------------------------
                     Network Setup 
@@ -69,7 +69,7 @@ echo -ne "
 while read line; do
     echo "INSTALLING: ${line}"
     sudo pacman -S --noconfirm --needed ${line}
-done <~$HOME/pkgs-base.txt
+done <$HOME/archcrystal/pkgs/base.txt
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -106,7 +106,7 @@ elif grep -E "Intel Corporation UHD" <<<${gpu_type}; then
     pacman -S --needed --noconfirm libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 fi
 #SETUP IS WRONG THIS IS RUN
-if ! source $HOME/setup.conf; then
+if ! source $HOME/archcrystal/setup.conf; then
     # Loop through user input until the user gives a valid username
     while true; do
         read -p "Please enter username:" username
@@ -138,7 +138,7 @@ if ! source $HOME/setup.conf; then
         fi
     done
 
-    echo "NAME_OF_MACHINE=${name_of_machine,,}" >>${HOME}/setup.conf
+    echo "NAME_OF_MACHINE=${name_of_machine,,}" >>${HOME}/archcrystal/setup.conf
 fi
 echo -ne "
 -------------------------------------------------------------------------

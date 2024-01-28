@@ -94,6 +94,7 @@ else
     partition3=${DISK}3
 fi
 
+# make filesystems EXT4 for / and FAT32 for /boot/efi
 mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
 mkfs.ext4 -L ROOT ${partition3}
 mount -t ext4 ${partition3} /mnt
@@ -115,7 +116,8 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 pacstrap /mnt base base-devel linux linux-firmware vim nano sudo archlinux-keyring wget libnewt --noconfirm --needed
-cp -R ${BASE_DIR}/* /mnt/home/${USERNAME}
+
+cp -R ${BASE_DIR} /mnt/root/archcrystal
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
 genfstab -L /mnt >>/mnt/etc/fstab

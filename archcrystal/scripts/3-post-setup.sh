@@ -8,7 +8,7 @@ echo -ne "
 Final Setup and Configurations
 GRUB EFI Bootloader Install & Check
 "
-source ${HOME}/setup.conf
+source ${HOME}/archcrystal/setup.conf
 
 if [[ -d "/sys/firmware/efi" ]]; then
   grub-install --efi-directory=/boot ${DISK}

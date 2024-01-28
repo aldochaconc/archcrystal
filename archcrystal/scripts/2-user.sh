@@ -10,12 +10,12 @@ echo -ne "
 
 Installing AUR Softwares
 "
-source $HOME/setup.conf
+source $HOME/archcrystal/setup.conf
 
 while read line; do
   echo "INSTALLING: ${line}"
   sudo pacman -S --noconfirm --needed ${line}
-done <~${HOME}/pkgs-desktop-env.txt
+done <${HOME}/archcrystal/desktop-env.txt
 
 cd ~
 git clone "https://aur.archlinux.org/yay.git"
@@ -26,12 +26,12 @@ makepkg -si --noconfirm
 while read line; do
   echo "INSTALLING: ${line}"
   sudo pacman -S --noconfirm --needed ${line}
-done <~${HOME}/pkgs-yay.txt
+done <${HOME}/archcrystal/yay.txt
 
 while read line; do
   echo "INSTALLING: ${line}"
   sudo pacman -S --noconfirm --needed ${line}
-done <~${HOME}/pkgs-fonts.txt
+done <${HOME}/archcrystal/fonts.txt
 
 export PATH=$PATH:~/.local/bin
 
