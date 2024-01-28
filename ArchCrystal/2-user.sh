@@ -5,13 +5,14 @@
 # @brief User customizations and AUR package installation.
 echo -ne "
 -------------------------------------------------------------------------
-                        SCRIPTHOME: ArchTitus
+                        SCRIPTHOME: ArchCrystal
 -------------------------------------------------------------------------
 
 Installing AUR Softwares
 "
 source $HOME/ArchCrystal/x-setup.conf
 
+# TODO: REMOVE ZSH TITUS CONFIG
 cd ~
 mkdir "/home/$USERNAME/.cache"
 touch "/home/$USERNAME/.cache/zshhistory"
