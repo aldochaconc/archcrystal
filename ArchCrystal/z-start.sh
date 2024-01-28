@@ -4,7 +4,7 @@ set -a
 BASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 set +a
 
-(bash "$BASE_DIR"/z-environment.sh) |& tee startup.log
+(bash "$BASE_DIR"/y-environment.sh) |& tee startup.log
 source "$BASE_DIR/x-setup.conf"
 (bash "$SCRIPTS_DIR/0-preinstall.sh") |& tee 0-preinstall.log
 (arch-chroot /mnt $HOME/ArchCrystal/1-setup.sh) |& tee 1-setup.log
