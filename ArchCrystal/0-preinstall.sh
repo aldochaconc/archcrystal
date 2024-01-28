@@ -115,11 +115,12 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 pacstrap /mnt base base-devel linux linux-firmware vim nano sudo archlinux-keyring wget libnewt --noconfirm --needed
-# cp ${BASE_DIR}/x-setup.conf /mnt/root/ArchCrystal/x-setup.conf
-# cp ${BASE_DIR}/1-setup.sh /mnt/root/ArchCrystal/1-setup.sh
-# cp ${BASE_DIR}/2-user.sh /mnt/root/ArchCrystal/2-user.sh
-# cp ${BASE_DIR}/3-post-setup.sh /mnt/root/ArchCrystal/3-post-setup.sh
-# cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
+mkdir -p /mnt/root/ArchCrystal
+cp ${BASE_DIR}/x-setup.conf /mnt/root/ArchCrystal/x-setup.conf
+cp ${BASE_DIR}/1-setup.sh /mnt/root/ArchCrystal/1-setup.sh
+cp ${BASE_DIR}/2-user.sh /mnt/root/ArchCrystal/2-user.sh
+cp ${BASE_DIR}/3-post-setup.sh /mnt/root/ArchCrystal/3-post-setup.sh
+cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
 genfstab -L /mnt >>/mnt/etc/fstab
 echo " 
