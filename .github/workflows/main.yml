@@ -1,12 +1,9 @@
 name: Versioning
 
 on:
-  workflow_dispatch:
-    inputs:
-      bump:
-        description: 'Type of version bump (major, minor, patch)'
-        required: true
-        default: 'patch'
+  push:
+    branches:
+      - main
 
 jobs:
   versioning:
@@ -20,25 +17,6 @@ jobs:
         run: |
           VERSION=$(grep -oP 'Version: \K.*' archcrystal.sh)
           echo "::set-output name=version::$VERSION"
-
-      - name: Bump version and commit
-        run: |
-          case "${{ github.event.inputs.bump }}" in
-            "major")
-              NEW_VERSION=$(echo "${{ steps.version.outputs.version }}" | awk -F. '{$1 = $1 + 1; $2 = 0; $3 = 0;} 1' OFS=".")
-              ;;
-            "minor")
-              NEW_VERSION=$(echo "${{ steps.version.outputs.version }}" | awk -F. '{$2 = $2 + 1; $3 = 0;} 1' OFS=".")
-              ;;
-            *)
-              NEW_VERSION=$(echo "${{ steps.version.outputs.version }}" | awk -F. '{$NF = $NF + 1;} 1' OFS=".")
-              ;;
-          esac
-          sed -i "s/Version=${{ steps.version.outputs.version }}/Version=$NEW_VERSION/" archcrystal.sh
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git commit -am "Bump version to $NEW_VERSION"
-          git push
 
       - name: Create Release
         id: create_release
