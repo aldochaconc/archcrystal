@@ -18,7 +18,7 @@ jobs:
       - name: Get current version
         id: version
         run: |
-          VERSION=$(grep -oP 'Version=\K.*' archcrystal.sh)
+          VERSION=$(grep -oP 'Version: \K.*' archcrystal.sh)
           echo "::set-output name=version::$VERSION"
 
       - name: Bump version and commit
