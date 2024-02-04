@@ -13,7 +13,7 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 pacman -S --noconfirm --needed networkmanager dhclient
-systemctl enable --now NetworkManager
+systemctl enable NetworkManager
 echo -ne "
 -------------------------------------------------------------------------
                     Setting up mirrors for optimal download 
@@ -66,10 +66,9 @@ echo -ne "
                     Installing Base System  
 -------------------------------------------------------------------------
 "
-while read line; do
-    echo "INSTALLING: ${line}"
-    sudo pacman -S --noconfirm --needed ${line}
-done <$HOME/archcrystal/pkgs/base.txt
+
+sudo pacman -S --noconfirm --needed \
+    mesa xorg ibus man-db vim neovim wifi-menu dialog
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -101,10 +100,23 @@ if grep -E "NVIDIA|GeForce" <<<${gpu_type}; then
 elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
     pacman -S --noconfirm --needed xf86-video-amdgpu
 elif grep -E "Integrated Graphics Controller" <<<${gpu_type}; then
-    pacman -S --noconfirm --needed libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
+    pacman -S --noconfirm --needed \
+        libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 elif grep -E "Intel Corporation UHD" <<<${gpu_type}; then
-    pacman -S --needed --noconfirm libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
+    pacman -S --needed --noconfirm \
+        libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 fi
+
+echo -ne "
+-------------------------------------------------------------------------
+                    Installing Audio Drivers
+-------------------------------------------------------------------------
+"
+pacman -S --noconfirm --needed \
+    alsa-utils alsa-plugins pulseaudio pulseaudio-alsa pulseaudio-bluetooth \
+    bluez bluez-utils
+systemctl enable bluetooth
+
 #SETUP IS WRONG THIS IS RUN
 if ! source $HOME/archcrystal/setup.conf; then
     # Loop through user input until the user gives a valid username
