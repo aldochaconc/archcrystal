@@ -1,0 +1,5 @@
+# Set backlight level to 8
+SUBSYSTEM=="backlight", 
+ACTION=="add", 
+KERNEL=="acpi_video0", 
+ATTR{brightness}="8"
