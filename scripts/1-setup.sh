@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 
 echo -ne "
--------------------------------------------------------------------------
+
                     Automated Arch Linux Installer
                         SCRIPTHOME: archcrystal
--------------------------------------------------------------------------
+
 "
 source $HOME/archcrystal/setup.conf
 echo -ne "
--------------------------------------------------------------------------
-                    Network Setup 
--------------------------------------------------------------------------
+
+Network Setup 
+
 "
 pacman -S --noconfirm --needed networkmanager dhclient
 systemctl enable NetworkManager
 echo -ne "
--------------------------------------------------------------------------
-                    Setting up mirrors for optimal download 
--------------------------------------------------------------------------
+
+Setting up Pacman mirrors for optimal download 
+
 "
 pacman -S --noconfirm --needed pacman-contrib curl
 pacman -S --noconfirm --needed reflector rsync grub arch-install-scripts git
@@ -25,11 +25,11 @@ cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 
 nc=$(grep -c ^processor /proc/cpuinfo)
 echo -ne "
--------------------------------------------------------------------------
-                    You have " $nc" cores. And
-			changing the makeflags for "$nc" cores. Aswell as
-				changing the compression settings.
--------------------------------------------------------------------------
+
+You have " $nc" cores. And
+changing the makeflags for "$nc" cores. 
+Aswell as changing the compression settings.
+
 "
 TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
 if [[ $TOTAL_MEM -gt 8000000 ]]; then
@@ -37,9 +37,9 @@ if [[ $TOTAL_MEM -gt 8000000 ]]; then
     sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $nc -z -)/g" /etc/makepkg.conf
 fi
 echo -ne "
--------------------------------------------------------------------------
-                    Setup Language to US and set locale  
--------------------------------------------------------------------------
+
+Setup Language and set locale  
+
 "
 sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 locale-gen
@@ -62,18 +62,16 @@ sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 pacman -Sy --noconfirm --needed
 
 echo -ne "
--------------------------------------------------------------------------
-                    Installing Base System  
--------------------------------------------------------------------------
+
+Installing Base System  
+
 "
 
-sudo pacman -S --noconfirm --needed \
-    mesa xorg ibus man-db vim neovim wifi-menu dialog
-
+sudo pacman -S --noconfirm --needed mesa xorg ibus man-db vim wifi-menu dialog
 echo -ne "
--------------------------------------------------------------------------
-                    Installing Microcode
--------------------------------------------------------------------------
+
+Installing Microcode
+
 "
 # determine processor type and install microcode
 proc_type=$(lscpu)
@@ -88,12 +86,13 @@ elif grep -E "AuthenticAMD" <<<${proc_type}; then
 fi
 
 echo -ne "
--------------------------------------------------------------------------
-                    Installing Graphics Drivers
--------------------------------------------------------------------------
+
+Installing Graphics Drivers
+
 "
 # Graphics Drivers find and install
 gpu_type=$(lspci)
+echo "GPU Type: ${gpu_type}"
 if grep -E "NVIDIA|GeForce" <<<${gpu_type}; then
     pacman -S --noconfirm --needed nvidia
     nvidia-xconfig
@@ -108,9 +107,9 @@ elif grep -E "Intel Corporation UHD" <<<${gpu_type}; then
 fi
 
 echo -ne "
--------------------------------------------------------------------------
-                    Installing Audio Drivers
--------------------------------------------------------------------------
+
+Installing Audio Drivers
+
 "
 pacman -S --noconfirm --needed \
     alsa-utils alsa-plugins pulseaudio pulseaudio-alsa pulseaudio-bluetooth \
@@ -153,9 +152,9 @@ if ! source $HOME/archcrystal/setup.conf; then
     echo "NAME_OF_MACHINE=${name_of_machine,,}" >>${HOME}/archcrystal/setup.conf
 fi
 echo -ne "
--------------------------------------------------------------------------
-                    Adding User
--------------------------------------------------------------------------
+
+Adding User
+
 "
 if [ $(whoami) = "root" ]; then
     groupadd libvirt
@@ -176,7 +175,8 @@ else
     echo "You are already a user proceed with aur installs"
 fi
 echo -ne "
--------------------------------------------------------------------------
-                    SYSTEM READY FOR 2-user.sh
--------------------------------------------------------------------------
+
+SYSTEM READY FOR 2-user.sh
+
 "
+read -p "Press enter to continue"

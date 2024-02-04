@@ -17,7 +17,7 @@ source $BASE_DIR/setup.conf
 cp -v *.log /mnt/home/$USERNAME
 
 echo -ne "
--------------------------------------------------------------------------
-                    Installation Complete
--------------------------------------------------------------------------
+
+Installation Complete
+
 "
