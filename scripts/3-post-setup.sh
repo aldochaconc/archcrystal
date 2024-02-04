@@ -5,7 +5,7 @@ echo -ne "
                         SCRIPTHOME: ArchCrystal
 -------------------------------------------------------------------------
 
-Final Setup and Configurations
+Final Setup and  -SConfigurations
 GRUB EFI Bootloader Install & Check
 "
 source ${HOME}/archcrystal/setup.conf
