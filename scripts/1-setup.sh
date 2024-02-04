@@ -13,7 +13,7 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 pacman -S --noconfirm --needed networkmanager dhclient
-systemctl enable --now NetworkManager
+systemctl enable NetworkManager
 echo -ne "
 -------------------------------------------------------------------------
                     Setting up mirrors for optimal download 
@@ -68,9 +68,7 @@ echo -ne "
 "
 
 sudo pacman -S --noconfirm --needed \
-    mesa xorg ibus ufw rxvt-unicode zsh man-db vim neovim
-echo "Setting up ZSH as default shell"
-chsh -s /bin/zsh
+    mesa xorg ibus man-db vim neovim wifi-menu dialog
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -117,7 +115,7 @@ echo -ne "
 pacman -S --noconfirm --needed \
     alsa-utils alsa-plugins pulseaudio pulseaudio-alsa pulseaudio-bluetooth \
     bluez bluez-utils
-systemctl enable --now bluetooth
+systemctl enable bluetooth
 
 #SETUP IS WRONG THIS IS RUN
 if ! source $HOME/archcrystal/setup.conf; then
