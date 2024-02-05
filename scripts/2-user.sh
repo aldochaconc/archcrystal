@@ -134,16 +134,16 @@ installYayPackages() {
 }
 
 # Invoke the function from above, with the name of the array
-# installPacmanPackages powerManagement "Power Management"
-# installPacmanPackages compatibility "Compatibility"
-# installPacmanPackages utilities "Utilities"
-# installPacmanPackages pacmanFonts "Pacman Fonts"
-# installPacmanPackages desktopEnv "Desktop Environment"
-# installPacmanPackages apps "Apps"
-# installPacmanPackages devEnv "Development Environment"
+installPacmanPackages powerManagement "Power Management"
+installPacmanPackages compatibility "Compatibility"
+installPacmanPackages utilities "Utilities"
+installPacmanPackages pacmanFonts "Pacman Fonts"
+installPacmanPackages desktopEnv "Desktop Environment"
+installPacmanPackages apps "Apps"
+installPacmanPackages devEnv "Development Environment"
 
-# installYayPackages yayFonts "Yay Fonts"
-# installYayPackages yayApps "Yay Apps"
+installYayPackages yayFonts "Yay Fonts"
+installYayPackages yayApps "Yay Apps"
 
 echo "Setting up ZSH as default shell"
 RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
