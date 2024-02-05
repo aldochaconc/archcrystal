@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script Name: archcrystal.sh
-# Version: 1.2.0
+# Version: 1.2.2
 
 set -a
 BASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
@@ -17,7 +17,7 @@ source $BASE_DIR/setup.conf
 cp -v *.log /mnt/home/$USERNAME
 
 echo -ne "
--------------------------------------------------------------------------
-                    Installation Complete
--------------------------------------------------------------------------
+
+Installation Complete
+
 "
