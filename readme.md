@@ -41,6 +41,8 @@ Later, there are "press to continue" prompts to verify what you are installing.
 - Compression settings.
 - Graphic drivers auto detection.
 
+
+## The script
 ### 0-preinstall.sh
 
 - Sets up Pacman optimal mirrors.
