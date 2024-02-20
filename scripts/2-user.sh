@@ -61,8 +61,6 @@ declare -A pkgsToInstall=(
   ["pacman:zsh"]="shell"
   ["yay:nvm"]="Node version manager"
 
-  # Secrets management
-
   # Monitoring
   ["pacman:acpid"]="DAEMON to dispatch ACPI events"
   ["pacman:htop"]="CLI process administrator"
@@ -76,15 +74,13 @@ declare -A pkgsToInstall=(
   ["pacman:bluez-utils"]="Utilities such as bluetoothctl"
   ["pacman:networkmanager"]="DAEMON Network manager"
 
-  # OS Compatibility
+  # Compatibility
   ["pacman:dosfstools"]="DOS filesystem utilities"
   ["pacman:ifuse"]="A fuse filesystem to access the contents of iOS devices"
   ["pacman:libimobiledevice"]="A cross-platform librariesand tools for iOS"
   ["pacman:libtool"]="A generic library support script"
   ["pacman:ntfs-3g"]="NTFS filesystem driver and utilities (windows compat)"
   ["pacman:os-prober"]="For detecting other operative system such as Windows"
-
-  # Drivers
   ["pacman:cups"]="Printers compat"
 
   # Fonts
