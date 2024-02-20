@@ -61,6 +61,10 @@ sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 pacman -Sy --noconfirm --needed
 
+# Enable ILoveCandy
+sed -i '35 i ILoveCandy' /etc/pacman.conf
+sed -i 's/#Color/Color/' /etc/pacman.conf
+
 echo -ne "
 
 Installing Base System  
