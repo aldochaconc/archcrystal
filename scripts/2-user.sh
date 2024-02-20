@@ -7,155 +7,138 @@
 source $HOME/archcrystal/setup.conf
 export PATH=$PATH:~/.local/bin
 
-echo -ne "
+if ! command -v yay &>/dev/null; then
+  echo -ne "
 Installing AUR Helper
 "
-cd ~
-git clone "https://aur.archlinux.org/yay.git"
-cd ~/yay
-makepkg -si --noconfirm
-cd ~
+  cd ~ && git clone "https://aur.archlinux.org/yay.git" && cd ~/yay && makepkg -si --noconfirm
+  cd ~
+else
+  echo "yay is already installed"
+fi
 
-declare -A powerManagement=(
-  ["thermald"]="Daemon to prevent cpu overheating"
-  ["acpid"]="Daemon to dispatch ACPI events"
-)
+installPackages() {
+  declare -n packages=$1
+  local toInstallPacman=""
+  local toInstallYay=""
 
-# Provide compat pkgs for iOS and windows. Also libs such as python-psutil, required in a lot of pkgs
-declare -A compatibility=(
-  ["dosfstools"]="DOS filesystem utilities"
-  ["ifuse"]="A fuse filesystem to access the contents of iOS devices"
-  ["libimobiledevice"]="A cross-platform librariesand tools for iOS"
-  ["libtool"]="A generic library support script"
-  ["ntfs-3g"]="NTFS filesystem driver and utilities (windows compat)"
-  ["ntp"]="Network Time Protocol"
-  ["os-prober"]="For detecting other operative system such as Windows"
-  ["python-pip"]="The PyPA recommended tool for installing Python packages"
-  ["python-psutil"]="Required by a lot of packages"
-)
-
-# Provide user utils for auth, keyring, monitor, compression
-declare -A utilities=(
-  ["tree"]="Show directory structures in cli"
-  ["gparted"]="Manage disks"
-  ["powerline"]="Statusline plugin for vim"
-  ["htop"]="CLI process administrator"
-  ["p7zip"]="Compression tool"
-  ["neofetch"]="i use arch btw"
-  ["ncdu"]="disk usage cli"
-
-)
-
-declare -A pacmanFonts=(
-  ["adobe-source-han-sans-otc-fonts"]="Adobe fonts for CN, KR, JP compat"
-  ["adobe-source-han-serif-otc-fonts"]="Adobe fonts for CN, KR, JP compat"
-  # ["otf-montserrat"]="Geometric sans-serif typeface"
-  # ["ttf-fira-mono"]="Monospaced font with programming ligatures"
-  # ["ttf-fira-sans"]="Geometric sans-serif typeface"
-  ["ttf-font-awesome"]="Dependency for powerline"
-  ["ttf-roboto-mono"]="Monospaced font family for user interface and coding environments"
-)
-
-declare -A yayFonts=(
-  ["powerline-fonts"]="Fonts for the powerline statusline plugin"
-  ["ttf-font-icons"]="A set of icons and symbols for TTF fonts"
-  ["nerd-fonts"]="Required for zsh and oh-my-zsh"
-  # ["ttf-google-fonts-git"]="Google Fonts packaged for Arch Linux"
-  # ["ttf-ionicons"]="The premium icon font for Ionic Framework"
-)
-
-declare -A desktopEnv=(
-  ["arandr"]="Manage screen layouts"
-  ["autorandr"]="Autorefresh screen layouts"
-  ["dunst"]="Notification daemon"
-  ["secret-tool"]="Allow apps use gnome-keyring"
-  ["i3"]="Tiling manager"
-  ["i3status"]="i3 dependency (bar)"
-  ["gnome-keyring"]="GNOME keyring for psw management"
-  ["rofi"]="App launcher"
-  ["xdg-user-dirs"]="Setup default dirs"
-  ["nautilus"]="GNOME file explorer"
-  ["pavucontrol"]="GNOME GUI Volume Control"
-  ["polkit-gnome"]="GNOME auth agent (dependency for gui apps)"
-  ["seahorse"]="GNOME application for managing PGP keys"
-)
-
-declare -A apps=(
-  ["chromium"]="A web browser built for speed, simplicity, and security"
-  # ["discord"]="All-in-one voice and text chat"
-)
-declare -A yayApps=(
-  ["lightscreen"]="A simple tool to automate screenshots"
-)
-
-declare -A devEnv=(
-  ["git"]="versioning"
-  ["neovim"]="vim fork"
-  ["nodejs"]="the best"
-  ["rxvt-unicode"]="terminal emulator"
-  ["zsh"]="shell"
-)
-
-installPacmanPackages() {
-  # print the list received as params
-  local -n packages=$1
-  local toInstall=""
-  echo ""
-  echo "$2"
-  echo "Packages to be installed"
-  echo ""
-  for package in "${!packages[@]}"; do
-    echo "- $package: ${packages[$package]}"
-    toInstall+="$package "
+  for key in "${!packages[@]}"; do
+    local packageManager=${key%%:*}
+    local package=${key#*:}
+    echo "- $package: ${packages[$key]}"
+    if [ "$packageManager" = "pacman" ]; then
+      toInstallPacman+="$package "
+    elif [ "$packageManager" = "yay" ]; then
+      toInstallYay+="$package "
+    fi
   done
-  echo ""
+
   read -p "Press enter to continue"
-  # shellcheck disable=SC2086
 
-  sudo pacman -S --noconfirm $toInstall
-}
-installYayPackages() {
-  # print the list received as params
-  local -n packages=$1
-  local toInstall=""
-
-  echo ""
-  echo "$2"
-
-  echo "Packages install:"
-  for package in "${!packages[@]}"; do
-    echo "- $package: ${packages[$package]}"
-    toInstall+="$package "
-  done
-  echo ""
-  read -p "Press enter to continue"
-  # shellcheck disable=SC2086
-  yay -S --noconfirm $toInstall
+  if [ -n "$toInstallPacman" ]; then
+    sudo pacman -S --noconfirm $toInstallPacman
+  fi
+  if [ -n "$toInstallYay" ]; then
+    yay -S --noconfirm $toInstallYay
+  fi
 }
 
-# Invoke the function from above, with the name of the array
-installPacmanPackages powerManagement "Power Management"
-installPacmanPackages compatibility "Compatibility"
-installPacmanPackages utilities "Utilities"
-installPacmanPackages pacmanFonts "Pacman Fonts"
-installPacmanPackages desktopEnv "Desktop Environment"
-installPacmanPackages apps "Apps"
-installPacmanPackages devEnv "Development Environment"
+declare -A pkgsToInstall=(
+  # Essentials
+  ["pacman:git"]="versioning"
+  ["pacman:neovim"]="Vim fork"
+  ["pacman:python-pip"]="The PyPA recommended tool for installing Python packages"
+  ["pacman:python-psutil"]="Required by a lot of packages"
+  ["pacman:vim"]="Vim"
+  ["pacman:libsecret"]="Allow apps use gnome-keyring"
+  ["pacman:ufw"]="DAEMON Firewall"
 
-installYayPackages yayFonts "Yay Fonts"
-installYayPackages yayApps "Yay Apps"
+  # Environment
+  ["pacman:nodejs"]="Node.js"
+  ["pacman:rxvt-unicode"]="terminal emulator"
+  ["pacman:zsh"]="shell"
+  ["yay:nvm"]="Node version manager"
+
+  # Secrets management
+
+  # Monitoring
+  ["pacman:acpid"]="DAEMON to dispatch ACPI events"
+  ["pacman:htop"]="CLI process administrator"
+  ["pacman:ncdu"]="disk usage cli"
+  ["pacman:neofetch"]="i use arch btw"
+  ["pacman:thermald"]="DAEMON to prevent cpu overheating"
+
+  # Network
+  ["pacman:ntp"]="Network Time Protocol"
+  ["pacman:bluez"]="DAEMON Bluetooth service"
+  ["pacman:bluez-utils"]="Utilities such as bluetoothctl"
+  ["pacman:networkmanager"]="DAEMON Network manager"
+
+  # OS Compatibility
+  ["pacman:dosfstools"]="DOS filesystem utilities"
+  ["pacman:ifuse"]="A fuse filesystem to access the contents of iOS devices"
+  ["pacman:libimobiledevice"]="A cross-platform librariesand tools for iOS"
+  ["pacman:libtool"]="A generic library support script"
+  ["pacman:ntfs-3g"]="NTFS filesystem driver and utilities (windows compat)"
+  ["pacman:os-prober"]="For detecting other operative system such as Windows"
+
+  # Drivers
+  ["pacman:cups"]="Printers compat"
+
+  # Fonts
+  ["pacman:adobe-source-han-sans-otc-fonts"]="Adobe fonts for CN, KR, JP compat"
+  ["pacman:adobe-source-han-serif-otc-fonts"]="Adobe fonts for CN, KR, JP compat"
+  ["pacman:ttf-fira-mono"]="Monospaced font with programming ligatures"
+  ["pacman:ttf-fira-sans"]="Geometric sans-serif typeface"
+  ["pacman:ttf-font-awesome"]="Dependency for powerline"
+  ["yay:nerd-fonts"]="Required for zsh and oh-my-zsh"
+  ["yay:powerline-fonts-git"]="Fonts for the powerline statusline plugin"
+  ["yay:ttf-font-icons"]="A set of icons and symbols for TTF fonts"
+  ["yay:ttf-roboto-mono"]="Monospaced font family for user interface and coding environments"
+
+  # Desktop environment
+  ["pacman:dunst"]="DAEMON Notification server "
+  ["pacman:rofi"]="App launcher"
+  ["pacman:i3"]="Tiling manager"
+  ["pacman:i3status"]="i3 dependency (bar)"
+  ["pacman:xdg-user-dirs"]="Setup default dirs"
+
+  # Desktop Application (Prioritizing GNOME apps)
+  ["pacman:arandr"]="GNOME Screen layout manager"
+  ["pacman:autorandr"]="Autorefresh screen layouts"
+  ["pacman:gnome-keyring"]="GNOME Keyring for psw management"
+  ["pacman:gparted"]="GNOME Disk manager"
+  ["pacman:nautilus"]="GNOME File explorer"
+  ["pacman:pavucontrol"]="GNOME Volume Control"
+  ["pacman:polkit-gnome"]="GNOME auth agent (dependency for gui apps)"
+  ["pacman:seahorse"]="GNOME application for managing PGP keys"
+  ["yay:lightscreen"]="GNOME Screenshots app"
+
+  # Apps & Utilities
+  ["pacman:chromium"]="A web browser built for speed, simplicity, and security"
+  ["pacman:discord"]="All-in-one voice and text chat"
+  ["pacman:p7zip"]="Compression tool"
+  ["pacman:powerline"]="Statusline plugin for vim"
+  ["pacman:tree"]="Show directory structures in cli"
+
+  # Developer environment
+
+)
+installPackages pkgsToInstall
 
 echo "Setting up ZSH as default shell"
-RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 chsh -s /bin/zsh
+echo "Installing oh-my-zsh"
+RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-echo "Enabling services"
-sudo systemctl enable thermald
-sudo systemctl enable acpid
-sudo systemctl enable NetworkManager
-sudo systemctl enable sshd
-sudo systemctl enable ntpd
-sudo systemctl enable bluetooth
+# echo "Enabling services"
+# sudo systemctl enable acpid
+# sudo systemctl enable bluetooth
+# sudo systemctl enable cups
+# sudo systemctl enable NetworkManager
+# sudo systemctl enable ntpd
+# sudo systemctl enable thermald
+# sudo systemctl enable ufw
 
 echo -ne "
 -------------------------------------------------------------------------
