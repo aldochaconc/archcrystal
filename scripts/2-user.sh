@@ -57,7 +57,6 @@ declare -A pkgsToInstall=(
   ["pacman:libsecret"]="Allow apps use gnome-keyring"
   ["pacman:ufw"]="DAEMON Firewall"
   ["pacman:pacman-contrib"]="Contributed scripts and tools for pacman systems"
-  ["pacman:util-linux"]="Utilities for handling file systems"
 
   # Environment
   ["pacman:nodejs"]="Node.js"
@@ -74,15 +73,12 @@ declare -A pkgsToInstall=(
 
   # Network
   ["pacman:ntp"]="Network Time Protocol"
-  ["pacman:bluez"]="DAEMON Bluetooth service"
   ["pacman:bluez-utils"]="Utilities such as bluetoothctl"
-  ["pacman:networkmanager"]="DAEMON Network manager"
 
   # Compatibility
   ["pacman:dosfstools"]="DOS filesystem utilities"
   ["pacman:ifuse"]="A fuse filesystem to access the contents of iOS devices"
   ["pacman:libimobiledevice"]="A cross-platform librariesand tools for iOS"
-  ["pacman:libtool"]="A generic library support script"
   ["pacman:ntfs-3g"]="NTFS filesystem driver and utilities (windows compat)"
   ["pacman:os-prober"]="For detecting other operative system such as Windows"
   ["pacman:cups"]="Printers compat"
@@ -90,7 +86,6 @@ declare -A pkgsToInstall=(
   # Fonts
   ["pacman:adobe-source-han-sans-otc-fonts"]="Adobe fonts for CN, KR, JP compat"
   ["pacman:ttf-font-awesome"]="Dependency for powerline"
-  ["yay:nerd-fonts"]="Required for zsh and oh-my-zsh"
   ["yay:powerline-fonts-git"]="Fonts for the powerline statusline plugin"
   ["yay:ttf-font-icons"]="A set of icons and symbols for TTF fonts"
   ["yay:ttf-roboto-mono"]="Monospaced font family for user interface and coding environments"
