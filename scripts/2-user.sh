@@ -52,6 +52,8 @@ declare -A pkgsToInstall=(
   ["pacman:vim"]="Vim"
   ["pacman:libsecret"]="Allow apps use gnome-keyring"
   ["pacman:ufw"]="DAEMON Firewall"
+  ["pacman:pacman-contrib"]="Contributed scripts and tools for pacman systems"
+  ["pacman:util-linux"]="Utilities for handling file systems"
 
   # Environment
   ["pacman:nodejs"]="Node.js"
@@ -131,14 +133,16 @@ chsh -s /bin/zsh
 echo "Installing oh-my-zsh"
 RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-# echo "Enabling services"
-# sudo systemctl enable acpid
-# sudo systemctl enable bluetooth
-# sudo systemctl enable cups
-# sudo systemctl enable NetworkManager
-# sudo systemctl enable ntpd
-# sudo systemctl enable thermald
-# sudo systemctl enable ufw
+echo "Enabling services"
+sudo systemctl enable acpid
+sudo systemctl enable bluetooth
+sudo systemctl enable cups
+sudo systemctl enable NetworkManager
+sudo systemctl enable ntpd
+sudo systemctl enable thermald
+sudo systemctl enable ufw
+sudo systemctl enable paccache.timer
+sudo systemctl enable trim.timer
 
 echo -ne "
 -------------------------------------------------------------------------
