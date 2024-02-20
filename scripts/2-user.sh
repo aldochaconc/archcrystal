@@ -16,6 +16,7 @@ Installing AUR Helper
 else
   echo "yay is already installed"
 fi
+yay -Sc --noconfirm
 
 installPackages() {
   declare -n packages=$1
@@ -33,20 +34,23 @@ installPackages() {
     fi
   done
 
+  # clears pacman cache
+
   read -p "Press enter to continue"
 
   if [ -n "$toInstallPacman" ]; then
     sudo pacman -S --noconfirm $toInstallPacman
   fi
+  sudo paccache -r
   if [ -n "$toInstallYay" ]; then
     yay -S --noconfirm $toInstallYay
   fi
+  yay -Sc --noconfirm
 }
 
 declare -A pkgsToInstall=(
   # Essentials
   ["pacman:git"]="versioning"
-  ["pacman:neovim"]="Vim fork"
   ["pacman:python-pip"]="The PyPA recommended tool for installing Python packages"
   ["pacman:python-psutil"]="Required by a lot of packages"
   ["pacman:vim"]="Vim"
@@ -85,9 +89,6 @@ declare -A pkgsToInstall=(
 
   # Fonts
   ["pacman:adobe-source-han-sans-otc-fonts"]="Adobe fonts for CN, KR, JP compat"
-  ["pacman:adobe-source-han-serif-otc-fonts"]="Adobe fonts for CN, KR, JP compat"
-  ["pacman:ttf-fira-mono"]="Monospaced font with programming ligatures"
-  ["pacman:ttf-fira-sans"]="Geometric sans-serif typeface"
   ["pacman:ttf-font-awesome"]="Dependency for powerline"
   ["yay:nerd-fonts"]="Required for zsh and oh-my-zsh"
   ["yay:powerline-fonts-git"]="Fonts for the powerline statusline plugin"
@@ -139,6 +140,28 @@ sudo systemctl enable thermald
 sudo systemctl enable ufw
 sudo systemctl enable paccache.timer
 sudo systemctl enable trim.timer
+
+echo "Setting up ZSH as default shell"
+chsh -s /bin/zsh
+echo "Installing oh-my-zsh"
+RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+echo "Setting up user directories"
+xdg-user-dirs-update
+
+echo "Setting up NVM"
+mkdir -p ~/.nvm
+echo "export NVM_DIR=\"$HOME/.nvm\"" >>$HOME/.zshrc
+echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"  # This loads nvm" >>$HOME/.zshrc
+echo "[ -s \"$NVM_DIR/bash_completion\" ] && \. \"$NVM_DIR/bash_completion\"  # This loads nvm bash_completion" >>$HOME/.zshrc
+
+echo "Setting up git"
+git config --global user.email "$GIT_EMAIL"
+git config --global user.name "$GIT_NAME"
+
+echo "Setting up firewall"
+sudo ufw default deny
+sudo ufw enable
 
 echo -ne "
 -------------------------------------------------------------------------
