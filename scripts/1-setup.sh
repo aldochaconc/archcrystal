@@ -12,8 +12,10 @@ echo -ne "
 Network Setup 
 
 "
-pacman -S --noconfirm --needed networkmanager dhclient
-systemctl enable NetworkManager
+pacman -S --noconfirm --needed networkmanager dhclient ntp
+systemctl enable --now NetworkManager
+systemctl enable --now dhclient
+systemctl enable --now ntpd
 echo -ne "
 
 Setting up Pacman mirrors for optimal download 
@@ -66,16 +68,12 @@ sed -i '35 i ILoveCandy' /etc/pacman.conf
 sed -i 's/#Color/Color/' /etc/pacman.conf
 
 echo -ne "
-
 Installing Base System  
-
 "
 
-sudo pacman -S --noconfirm --needed mesa xorg ibus man-db vim wifi-menu dialog
+sudo pacman -S --noconfirm --needed mesa xorg ibus man-db vim
 echo -ne "
-
 Installing Microcode
-
 "
 # determine processor type and install microcode
 proc_type=$(lscpu)
@@ -109,16 +107,6 @@ elif grep -E "Intel Corporation UHD" <<<${gpu_type}; then
     pacman -S --needed --noconfirm \
         libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 fi
-
-echo -ne "
-
-Installing Audio Drivers
-
-"
-pacman -S --noconfirm --needed \
-    alsa-utils alsa-plugins pulseaudio pulseaudio-alsa pulseaudio-bluetooth \
-    bluez bluez-utils
-systemctl enable bluetooth
 
 #SETUP IS WRONG THIS IS RUN
 if ! source $HOME/archcrystal/setup.conf; then
@@ -156,9 +144,7 @@ if ! source $HOME/archcrystal/setup.conf; then
     echo "NAME_OF_MACHINE=${name_of_machine,,}" >>${HOME}/archcrystal/setup.conf
 fi
 echo -ne "
-
 Adding User
-
 "
 if [ $(whoami) = "root" ]; then
     groupadd libvirt
@@ -179,8 +165,6 @@ else
     echo "You are already a user proceed with aur installs"
 fi
 echo -ne "
-
 SYSTEM READY FOR 2-user.sh
-
 "
 read -p "Press enter to continue"
