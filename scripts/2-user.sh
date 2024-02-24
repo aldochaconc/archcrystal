@@ -103,7 +103,7 @@ declare -A graphicServer=(
   ["pacman:rofi"]="App launcher"
   ["pacman:dunst"]="DAEMON Notification server"
 )
-installPackages wm
+installPackages graphicServer
 
 echo "Installing desktop apps"
 declare -A desktopApps=(
