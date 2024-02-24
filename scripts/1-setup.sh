@@ -1,77 +1,52 @@
 #!/usr/bin/env bash
 
-echo -ne "
-
-                    Automated Arch Linux Installer
-                        SCRIPTHOME: archcrystal
-
-"
+echo -ne "Setting up archcrystal"
 source $HOME/archcrystal/setup.conf
-echo -ne "
 
-Network Setup 
-
-"
+echo "Setting up Network"
 pacman -S --noconfirm --needed networkmanager dhclient ntp
 systemctl enable --now NetworkManager
 systemctl enable --now dhclient
 systemctl enable --now ntpd
-echo -ne "
 
-Setting up Pacman mirrors for optimal download 
-
-"
-pacman -S --noconfirm --needed pacman-contrib curl
-pacman -S --noconfirm --needed reflector rsync grub arch-install-scripts git
+echo "Setting up Pacman"
+pacman -S --noconfirm --needed pacman-contrib curl reflector rsync grub arch-install-scripts git
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
+sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+pacman -Sy --noconfirm --needed
+sed -i '35 i ILoveCandy' /etc/pacman.conf
+sed -i 's/#Color/Color/' /etc/pacman.conf
+systemctl enable paccache.timer
+systemctl enable trim.timer
 
+echo "Setting up compression settings"
 nc=$(grep -c ^processor /proc/cpuinfo)
-echo -ne "
-
-You have " $nc" cores. And
-changing the makeflags for "$nc" cores. 
-Aswell as changing the compression settings.
-
-"
 TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
 if [[ $TOTAL_MEM -gt 8000000 ]]; then
     sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$nc\"/g" /etc/makepkg.conf
     sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $nc -z -)/g" /etc/makepkg.conf
 fi
-echo -ne "
 
-Setup Language and set locale  
-
-"
+echo "Setup Language, locale and keymap"
 sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 locale-gen
 timedatectl --no-ask-password set-timezone ${TIMEZONE}
 timedatectl --no-ask-password set-ntp 1
-localectl --no-ask-password set-locale LANG="en_US.UTF-8" LC_TIME="en_US.UTF-8"
-ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
-# Set keymaps
-localectl --no-ask-password set-keymap ${KEYMAP}
+sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+locale-gen
+echo "LANG=en_US.UTF-8" >/etc/locale.conf
+echo "LC_TIME=en_US.UTF-8" >>/etc/locale.conf
+ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
+echo "KEYMAP=${KEYMAP}" >/etc/vconsole.conf
 
 # Add sudo no password rights
 sed -i 's/^# %wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
 sed -i 's/^# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /etc/sudoers
 
-#Add parallel downloading
-sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
+echo -ne "Pacstrapping Base System"
 
-#Enable multilib
-sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
-pacman -Sy --noconfirm --needed
-
-# Enable ILoveCandy
-sed -i '35 i ILoveCandy' /etc/pacman.conf
-sed -i 's/#Color/Color/' /etc/pacman.conf
-
-echo -ne "
-Installing Base System  
-"
-
-sudo pacman -S --noconfirm --needed mesa xorg ibus man-db vim
+pacman -S --noconfirm --needed mesa ibus man-db vim
 echo -ne "
 Installing Microcode
 "
@@ -164,6 +139,7 @@ if [ $(whoami) = "root" ]; then
 else
     echo "You are already a user proceed with aur installs"
 fi
+
 echo -ne "
 SYSTEM READY FOR 2-user.sh
 "
