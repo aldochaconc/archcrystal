@@ -83,7 +83,6 @@ declare -A drivers=(
   ["pacman:pipewire-audio"]="Audio server"
   ["pacman:pipewire-docs"]="Pipewire documentation"
   ["pacman:wireplumber"]="Pipewire session manager"
-  ["pacman:pipewire-media-session"]="Pipewire media session"
   ["pacman:pipewire-alsa"]="Pipewire alsa"
   # Bluetooth
   ["pacman:bluez"]="Bluetooth stack"
