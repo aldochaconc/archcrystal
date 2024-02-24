@@ -1,16 +1,10 @@
 #!/usr/bin/env bash
-#github-action genshdoc
-#
-# @file User
-# @brief User customizations and AUR package installation.
 
 source $HOME/archcrystal/setup.conf
 export PATH=$PATH:~/.local/bin
 
 if ! command -v yay &>/dev/null; then
-  echo -ne "
-Installing AUR Helper
-"
+  echo "Installing AUR Helper"
   cd ~ && git clone "https://aur.archlinux.org/yay.git" && cd ~/yay && makepkg -si --noconfirm && cd ~
 else
   echo "yay is already installed"
@@ -22,6 +16,7 @@ installPackages() {
   local toInstallPacman=""
   local toInstallYay=""
 
+  echo "Packages to install"
   for key in "${!packages[@]}"; do
     local packageManager=${key%%:*}
     local package=${key#*:}
@@ -33,10 +28,7 @@ installPackages() {
     fi
   done
 
-  # clears pacman cache
-
   read -p "Press enter to continue"
-
   if [ -n "$toInstallPacman" ]; then
     sudo pacman -S --noconfirm $toInstallPacman
   fi
@@ -47,70 +39,57 @@ installPackages() {
   yay -Sc --noconfirm
 }
 
-## NOTE: I suggest to install the packages in groups, so you can check if everything is working fine
+################################################################################
 
-# Essentials
-declare -A essentials=(
-  ["pacman:git"]="versioning"
-  ["pacman:python-pip"]="The PyPA recommended tool for installing Python packages"
-  ["pacman:python-psutil"]="Required by a lot of packages"
-  ["pacman:vim"]="Vim"
-  ["pacman:libsecret"]="Allow apps use gnome-keyring"
-  ["pacman:ufw"]="DAEMON Firewall"
-  ["pacman:pacman-contrib"]="Contributed scripts and tools for pacman systems"
-  ["pacman:nodejs"]="Node.js"
+echo "Setup terminal"
+declare -A terminal=(
   ["pacman:rxvt-unicode"]="terminal emulator"
   ["pacman:zsh"]="shell"
-  ["yay:nvm"]="Node version manager"
-  ["yay:mkinitcpio-firmware"]="Firmware and drivers for initramfs"
-  ["pacman:util-linux"]="Utilities for handling filesystems"
 )
-installPackages essentials
-
-echo "Setting up hooks"
-sudo systemctl enable paccache.timer
-sudo systemctl enable trim.timer
-
-echo "Setting up firewall"
-sudo systemctl enable ufw
-sudo ufw default deny
-sudo ufw enable
-
+installPackages terminal
 echo "Setting up ZSH as default shell"
 chsh -s /bin/zsh
 echo "Installing oh-my-zsh"
 RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-echo "Setting up NVM"
-mkdir -p ~/.nvm
-echo "export NVM_DIR=\"$HOME/.nvm\"" >>$HOME/.zshrc
-echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"  # This loads nvm" >>$HOME/.zshrc
-echo "[ -s \"$NVM_DIR/bash_completion\" ] && \. \"$NVM_DIR/bash_completion\"  # This loads nvm bash_completion" >>$HOME/.zshrc
+################################################################################
+echo "Installing essentials"
+declare -A essentials=(
+  ["pacman:libsecret"]="Allow apps use gnome-keyring"
+  ["pacman:ufw"]="DAEMON Firewall"
+  ["yay:mkinitcpio-firmware"]="Firmware and drivers for initramfs"
+)
+installPackages essentials
+echo "Setting up firewall"
+sudo systemctl enable ufw
+sudo ufw default deny
+sudo ufw enable
 
+###############################################################################
+echo "Setting basic monitoring tools"
 declare -A monitoring=(
   ["pacman:acpid"]="DAEMON to dispatch ACPI events"
   ["pacman:htop"]="CLI process administrator"
-  ["pacman:ncdu"]="disk usage cli"
   ["pacman:thermald"]="DAEMON to prevent cpu overheating"
 )
 installPackages monitoring
-
-echo "Enabling services"
 sudo systemctl enable acpid
 sudo systemctl enable thermald
 
+echo "Installing audio drivers"
 declare -A drivers=(
-  ["pacman:alsa-plugins"]="ALSA"
-  ["pacman:alsa-utils"]="ALSA"
-  ["pacman:bluez-utils"]="Pulseaudio"
-  ["pacman:bluez"]="Pulseaudio"
-  ["pacman:cups"]="Printers compat"
-  ["pacman:dosfstools"]="DOS filesystem utilities"
-  ["pacman:ifuse"]="A fuse filesystem to access the contents of iOS devices"
-  ["pacman:libimobiledevice"]="A cross-platform librariesand tools for iOS"
-  ["pacman:ntfs-3g"]="NTFS filesystem driver and utilities (windows compat)"
-  ["pacman:os-prober"]="For detecting other operative system such as Windows"
-
+  # Audio
+  ["pacman:pipewire"]="Audio server"
+  ["pacman:pipewire-audio"]="Audio server"
+  ["pacman:pipewire-docs"]="Pipewire documentation"
+  ["pacman:wireplumber"]="Pipewire session manager"
+  ["pacman:pipewire-media-session"]="Pipewire media session"
+  ["pacman:pipewire-alsa"]="Pipewire alsa"
+  # Bluetooth
+  ["pacman:bluez"]="Bluetooth stack"
+  ["pacman:bluez-utils"]="Bluetooth stack"
+  # Printer
+  ["pacman:cups"]="Printer"
 )
 installPackages drivers
 
@@ -118,17 +97,17 @@ echo "Enabling drivers"
 sudo systemctl enable cups
 sudo systemctl enable bluetooth
 
-declare -A wm=(
+declare -A graphicServer=(
+  ["pacman:xorg"]="Xorg"
   ["pacman:i3"]="Tiling manager"
   ["pacman:i3status"]="i3 dependency (bar)"
-  ["pacman:picom"]="Compositor"
   ["pacman:rofi"]="App launcher"
-  ["pacman:xorg-xinit"]="Xorg"
   ["pacman:dunst"]="DAEMON Notification server"
 )
 installPackages wm
 
-declare -A desktop=(
+echo "Installing desktop apps"
+declare -A desktopApps=(
   ["pacman:feh"]="Image viewer"
   ["pacman:arandr"]="GNOME Screen layout manager"
   ["pacman:autorandr"]="Autorefresh screen layouts"
@@ -139,15 +118,14 @@ declare -A desktop=(
   ["pacman:polkit-gnome"]="GNOME auth agent (dependency for gui apps)"
   ["pacman:seahorse"]="GNOME application for managing PGP keys"
   ["pacman:gnome-screenshot"]="GNOME Screenshots app"
-  ["pacman:pulseaudio-alsa"]="Pulseaudio"
-  ["pacman:pulseaudio-bluetooth"]="Pulseaudio"
-  ["pacman:pulseaudio"]="Pulseaudio"
   ["pacman:xdg-user-dirs"]="Setup default dirs"
-)
-installPackages desktop
+  ["pacman:ncdu"]="disk usage cli"
 
+)
+installPackages desktopApps
 xdg-user-dirs-update
 
+echo "Installing fonts"
 declare -A fonts=(
   ["pacman:adobe-source-han-sans-otc-fonts"]="Adobe fonts for CN, KR, JP compat"
   ["pacman:ttf-font-awesome"]="Dependency for powerline"
@@ -158,6 +136,7 @@ declare -A fonts=(
 )
 installPackages fonts
 
+echo "Installing apps"
 declare -A apps=(
   ["pacman:chromium"]="A web browser built for speed, simplicity, and security"
   ["pacman:discord"]="All-in-one voice and text chat"
@@ -167,7 +146,22 @@ declare -A apps=(
 )
 installPackages apps
 
-## Final touches
+# declare -A dev=(
+#   ["pacman:docker"]="Container runtime"
+#   ["pacman:docker-compose"]="Container runtime"
+#   ["pacman:go"]="Go"
+#   ["yay:nvm"]="Node version manager"
+#   ["pacman:python-pip"]="The PyPA recommended tool for installing Python packages"
+#   ["pacman:python-psutil"]="Required by a lot of packages"
+# )
+
+# echo "Installing dev environment"
+# installPackages dev
+# echo "Setting up NVM"
+# mkdir -p ~/.nvm
+# echo "export NVM_DIR=\"$HOME/.nvm\"" >>$HOME/.zshrc
+# echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"  # This loads nvm" >>$HOME/.zshrc
+# echo "[ -s \"$NVM_DIR/bash_completion\" ] && \. \"$NVM_DIR/bash_completion\"  # This loads nvm bash_completion" >>$HOME/.zshrc
 
 echo -ne "
 -------------------------------------------------------------------------
