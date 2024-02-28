@@ -39,42 +39,43 @@ installPackages() {
   yay -Sc --noconfirm
 }
 
-################################################################################
+echo "Installing essentials"
+declare -A essentials=(
+  # Basic dependencies
+  ["yay:mkinitcpio-firmware"]="Firmware and drivers for initramfs"
+  ["pacman:libsecret"]="Allow apps use gnome-keyring"
+  ["pacman:xsel"]="Clipboard manager"
 
-echo "Setup terminal"
-declare -A terminal=(
+  # Terminal
   ["pacman:rxvt-unicode"]="terminal emulator"
+  ["pacman:urxvt-perls"]="Perl extensions for urxvt"
   ["pacman:zsh"]="shell"
+
+  # Monitor
+  ["pacman:acpid"]="DAEMON to dispatch ACPI events"
+  ["pacman:htop"]="CLI process administrator"
+  ["pacman:thermald"]="DAEMON to prevent cpu overheating"
+  ["pacman:ufw"]="DAEMON Firewall"
+  ["pacman:neofetch"]="CLI System information tool"
+
+  # Graphic server
+  ["pacman:xorg-xinit"]="Xinit"
+  ["pacman:xorg"]="Xorg"
 )
-installPackages terminal
+installPackages essentials
+
 echo "Setting up ZSH as default shell"
 chsh -s /bin/zsh
 echo "Installing oh-my-zsh"
 RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-################################################################################
-echo "Installing essentials"
-declare -A essentials=(
-  ["pacman:libsecret"]="Allow apps use gnome-keyring"
-  ["pacman:ufw"]="DAEMON Firewall"
-  ["yay:mkinitcpio-firmware"]="Firmware and drivers for initramfs"
-)
-installPackages essentials
+echo "Enabling services"
+sudo systemctl enable acpid --now
+sudo systemctl enable thermald --now
+sudo systemctl enable ufw --now
 echo "Setting up firewall"
-sudo systemctl enable ufw
 sudo ufw default deny
 sudo ufw enable
-
-###############################################################################
-echo "Setting basic monitoring tools"
-declare -A monitoring=(
-  ["pacman:acpid"]="DAEMON to dispatch ACPI events"
-  ["pacman:htop"]="CLI process administrator"
-  ["pacman:thermald"]="DAEMON to prevent cpu overheating"
-)
-installPackages monitoring
-sudo systemctl enable acpid
-sudo systemctl enable thermald
 
 echo "Installing audio drivers"
 declare -A drivers=(
@@ -96,30 +97,39 @@ echo "Enabling drivers"
 sudo systemctl enable cups
 sudo systemctl enable bluetooth
 
-declare -A graphicServer=(
-  ["pacman:xorg"]="Xorg"
-  ["pacman:i3"]="Tiling manager"
-  ["pacman:i3status"]="i3 dependency (bar)"
-  ["pacman:rofi"]="App launcher"
-  ["pacman:dunst"]="DAEMON Notification server"
-)
-installPackages graphicServer
-
 echo "Installing desktop apps"
 declare -A desktopApps=(
-  ["pacman:feh"]="Image viewer"
-  ["pacman:arandr"]="GNOME Screen layout manager"
+  # wm
+  ["pacman:i3"]="Tiling manager"
+  ["pacman:i3status"]="i3 bar"
+
+  # Ricing
+  ["pacman:dunst"]="DAEMON Notification server"
+  ["pacman:feh"]="Image viewer and wallpaper setter"
+  ["pacman:picom"]="Compositor"
+  ["pacman:rofi"]="App launcher"
+
+  # apps
   ["pacman:autorandr"]="Autorefresh screen layouts"
+  ["pacman:chromium"]="A web browser built for speed, simplicity, and security"
+  ["pacman:discord"]="All-in-one voice and text chat"
+  ["pacman:ncdu"]="disk usage cli"
+  ["pacman:p7zip"]="Compression tool"
+  ["pacman:powerline"]="Statusline plugin for vim"
+  ["pacman:redshift"]="Image viewer"
+  ["pacman:tree"]="Show directory structures in cli"
+  ["pacman:xdg-user-dirs"]="Setup default dirs"
+
+  # gnome env
+  ["pacman:arandr"]="GNOME Screen layout manager"
   ["pacman:gnome-keyring"]="GNOME Keyring for psw management"
+  ["pacman:gnome-screenshot"]="GNOME Screenshots app"
   ["pacman:gparted"]="GNOME Disk manager"
   ["pacman:nautilus"]="GNOME File explorer"
   ["pacman:pavucontrol"]="GNOME Volume Control"
   ["pacman:polkit-gnome"]="GNOME auth agent (dependency for gui apps)"
   ["pacman:seahorse"]="GNOME application for managing PGP keys"
-  ["pacman:gnome-screenshot"]="GNOME Screenshots app"
-  ["pacman:xdg-user-dirs"]="Setup default dirs"
-  ["pacman:ncdu"]="disk usage cli"
-
+  ["pacman:seahorse-nautilus"]="GNOME application for managing PGP keys"
 )
 installPackages desktopApps
 xdg-user-dirs-update
@@ -127,6 +137,7 @@ xdg-user-dirs-update
 echo "Installing fonts"
 declare -A fonts=(
   ["pacman:adobe-source-han-sans-otc-fonts"]="Adobe fonts for CN, KR, JP compat"
+  ["pacman:ttf-fira-code"]="Base font"
   ["pacman:ttf-font-awesome"]="Dependency for powerline"
   ["yay:powerline-fonts-git"]="Fonts for the powerline statusline plugin"
   ["yay:ttf-font-icons"]="A set of icons and symbols for TTF fonts"
@@ -134,16 +145,6 @@ declare -A fonts=(
   ["yay:ttf-roboto-mono"]="Monospaced font family for user interface and coding environments"
 )
 installPackages fonts
-
-echo "Installing apps"
-declare -A apps=(
-  ["pacman:chromium"]="A web browser built for speed, simplicity, and security"
-  ["pacman:discord"]="All-in-one voice and text chat"
-  ["pacman:p7zip"]="Compression tool"
-  ["pacman:powerline"]="Statusline plugin for vim"
-  ["pacman:tree"]="Show directory structures in cli"
-)
-installPackages apps
 
 # declare -A dev=(
 #   ["pacman:docker"]="Container runtime"
@@ -154,18 +155,29 @@ installPackages apps
 #   ["pacman:python-psutil"]="Required by a lot of packages"
 # )
 
-# echo "Installing dev environment"
-# installPackages dev
-# echo "Setting up NVM"
-# mkdir -p ~/.nvm
-# echo "export NVM_DIR=\"$HOME/.nvm\"" >>$HOME/.zshrc
-# echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"  # This loads nvm" >>$HOME/.zshrc
-# echo "[ -s \"$NVM_DIR/bash_completion\" ] && \. \"$NVM_DIR/bash_completion\"  # This loads nvm bash_completion" >>$HOME/.zshrc
+echo "Setup dotfiles"
 
-echo -ne "
--------------------------------------------------------------------------
-                    SYSTEM READY FOR 3-post-setup.sh
--------------------------------------------------------------------------
-"
+read -p "Do you want to copy dotfiles from archcrystal project? [y/N] " -n 1 -r
+
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  # TODO: find a fancier way to do this
+  echo "Copying dotfiles"
+  cd ~ && git clone $DOTFILES && cd dotfiles
+  # i3
+  mkdir -p ~/.config/i3
+  cp ./config/i3/config ~/.config/i3/config
+  # rofi
+  mkdir -p ~/.config/rofi
+  cp ./config/rofi/config.rasi ~/.config/rofi/config.rasi
+
+  cp ./.zshrc ~/.zshrc
+  cp ./.Xresources ~/.Xresources
+  cp ./.xinitrc ~/.xinitrc
+  cp ./.xprofile ~/.xprofile
+
+  echo "Dotfiles copied"
+fi
+
+echo "SYSTEM READY FOR 3-post-setup.sh"
 read -p "Press enter to continue"
 exit
