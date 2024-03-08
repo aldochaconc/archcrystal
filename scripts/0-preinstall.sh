@@ -1,60 +1,40 @@
 #!/usr/bin/env bash
 
-echo -ne "
--------------------------------------------------------------------------
-                    0 - Pre-Install
--------------------------------------------------------------------------
-
-Setting up mirrors for optimal download
-"
+echo "Setting up installer environment"
 source $BASE_DIR/setup.conf
+pacman -Sy --noconfirm archlinux-keyring
+
 iso=$(curl -4 ifconfig.co/country-iso)
 timedatectl set-ntp true
-pacman -S --noconfirm archlinux-keyring #update keyrings to latest to prevent packages failing to install
+
+echo -ne "Enabling parallel downloads"
 pacman -S --noconfirm --needed pacman-contrib
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
+
+echo -ne "Setting up $iso mirrors for faster downloads"
 pacman -S --noconfirm --needed reflector rsync grub
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
-echo -ne "
-
-Setting up $iso mirrors for faster downloads
-
-"
 reflector -a 48 -c "$iso" -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
-mkdir /mnt &>/dev/null # Hiding error message if any
-echo -ne "
+mkdir /mnt &>/dev/null
 
-Installing Prerequisites
-
-"
+echo -ne "Formatting Disk"
 pacman -S --noconfirm --needed gptfdisk btrfs-progs glibc
-echo -ne "
--------------------------------------------------------------------------
-                    Formating Disk
--------------------------------------------------------------------------
-"
+umount -A --recursive /mnt &>/dev/null
 
-umount -A --recursive /mnt # make sure everything is unmounted before we start
-# disk prep
-sgdisk -Z ${DISK}         # zap all on disk
-sgdisk -a 2048 -o ${DISK} # new gpt disk 2048 alignment
+echo "Wiping Disk"
+sgdisk -Z ${DISK}
+sgdisk -a 2048 -o ${DISK}
 
-# create partitions
-sgdisk -n 1::+1M --typecode=1:ef02 --change-name=1:'BIOSBOOT' ${DISK} # partition 1 (BIOS Boot Partition)
-sgdisk -n 2::+1G --typecode=2:ef00 --change-name=2:'EFIBOOT' ${DISK}  # partition 2 (UEFI Boot Partition)
-sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' ${DISK}      # partition 3 (Root), default start, remaining
-if [[ ! -d "/sys/firmware/efi" ]]; then                               # Checking for bios system
+echo "Partitioning Disk"
+sgdisk -n 1::+1M --typecode=1:ef02 --change-name=1:'BIOSBOOT' ${DISK}
+sgdisk -n 2::+1G --typecode=2:ef00 --change-name=2:'EFIBOOT' ${DISK}
+sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' ${DISK}
+if [[ ! -d "/sys/firmware/efi" ]]; then
     sgdisk -A 1:set:2 ${DISK}
 fi
-partprobe ${DISK} # reread partition table to ensure it is correct
+partprobe ${DISK}
 
-# make filesystems
-echo -ne "
-
-Creating Filesystems
-
-"
-# @description Creates the btrfs subvolumes.
+echo -ne "Creating Filesystems"
 createsubvolumes() {
     btrfs subvolume create /mnt/@
     btrfs subvolume create /mnt/@home
@@ -62,26 +42,17 @@ createsubvolumes() {
     btrfs subvolume create /mnt/@tmp
     btrfs subvolume create /mnt/@.snapshots
 }
-
-# @description Mount all btrfs subvolumes after root has been mounted.
 mountallsubvol() {
     mount -o ${MOUNT_OPTIONS},subvol=@home ${partition3} /mnt/home
     mount -o ${MOUNT_OPTIONS},subvol=@tmp ${partition3} /mnt/tmp
     mount -o ${MOUNT_OPTIONS},subvol=@var ${partition3} /mnt/var
     mount -o ${MOUNT_OPTIONS},subvol=@.snapshots ${partition3} /mnt/.snapshots
 }
-
-# @description BTRFS subvolulme creation and mounting.
 subvolumesetup() {
-    # create nonroot subvolumes
     createsubvolumes
-    # unmount root to remount with subvolume
     umount /mnt
-    # mount @ subvolume
     mount -o ${MOUNT_OPTIONS},subvol=@ ${partition3} /mnt
-    # make directories home, .snapshots, var, tmp
     mkdir -p /mnt/{home,var,tmp,.snapshots}
-    # mount subvolumes
     mountallsubvol
 }
 
@@ -93,12 +64,10 @@ else
     partition3=${DISK}3
 fi
 
-# make filesystems EXT4 for / and FAT32 for /boot/efi
 mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
 mkfs.ext4 -L ROOT ${partition3}
 mount -t ext4 ${partition3} /mnt
 
-# mount target
 mkdir -p /mnt/boot/efi
 mount -t vfat -L EFIBOOT /mnt/boot/
 
@@ -109,26 +78,31 @@ if ! grep -qs '/mnt' /proc/mounts; then
     echo "Rebooting in 1 Second ..." && sleep 1
     reboot now
 fi
-echo -ne "
+echo -ne "Pacstrapping Archlinux base system"
+pacstrap /mnt \
+    archlinux-keyring \
+    base \
+    base-devel \
+    git \
+    libnewt \
+    linux \
+    linux-firmware \
+    linux-headers \
+    sudo \
+    vim \
+    wget \
+    pacman-contrib \
+    util-linux
 
-Arch Install on Main Drive
-
-"
-pacstrap /mnt base base-devel linux linux-firmware linux-headers vim sudo archlinux-keyring wget libnewt --noconfirm --needed
+--noconfirm --needed
 
 cp -R ${BASE_DIR} /mnt/root/archcrystal
-cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
+echo "Generating FSTAB"
 genfstab -L /mnt >>/mnt/etc/fstab
-echo "
-  Generated /etc/fstab:
-"
 cat /mnt/etc/fstab
-echo -ne "
--------------------------------------------------------------------------
-                    GRUB BIOS Bootloader Install & Check
--------------------------------------------------------------------------
-"
+
+echo "Setting up boot"
 if [[ ! -d "/sys/firmware/efi" ]]; then
     grub-install --boot-directory=/mnt/boot ${DISK}
 else
