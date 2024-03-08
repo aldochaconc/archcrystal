@@ -10,6 +10,8 @@ systemctl enable --now dhclient
 systemctl enable --now ntpd
 
 echo "Setting up Pacman"
+pacman -Sy archlinux-keyring
+
 pacman -S --noconfirm --needed pacman-contrib curl reflector rsync grub arch-install-scripts git
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf

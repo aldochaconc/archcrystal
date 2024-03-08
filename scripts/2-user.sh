@@ -70,11 +70,9 @@ echo "Installing oh-my-zsh"
 RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 echo "Enabling services"
-sudo systemctl enable acpid --now
-sudo systemctl enable thermald --now
-sudo systemctl enable ufw --now
-echo "Setting up firewall"
-sudo ufw default deny
+sudo systemctl enable acpid
+sudo systemctl enable thermald
+sudo systemctl enable ufw
 sudo ufw enable
 
 echo "Installing audio drivers"
@@ -154,29 +152,6 @@ installPackages fonts
 #   ["pacman:python-pip"]="The PyPA recommended tool for installing Python packages"
 #   ["pacman:python-psutil"]="Required by a lot of packages"
 # )
-
-echo "Setup dotfiles"
-
-read -p "Do you want to copy dotfiles from archcrystal project? [y/N] " -n 1 -r
-
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-  # TODO: find a fancier way to do this
-  echo "Copying dotfiles"
-  cd ~ && git clone $DOTFILES && cd dotfiles
-  # i3
-  mkdir -p ~/.config/i3
-  cp ./config/i3/config ~/.config/i3/config
-  # rofi
-  mkdir -p ~/.config/rofi
-  cp ./config/rofi/config.rasi ~/.config/rofi/config.rasi
-
-  cp ./.zshrc ~/.zshrc
-  cp ./.Xresources ~/.Xresources
-  cp ./.xinitrc ~/.xinitrc
-  cp ./.xprofile ~/.xprofile
-
-  echo "Dotfiles copied"
-fi
 
 echo "SYSTEM READY FOR 3-post-setup.sh"
 read -p "Press enter to continue"
