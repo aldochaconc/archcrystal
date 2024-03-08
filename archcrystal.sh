@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script Name: archcrystal.sh
-# Version: 1.3.1
+# Version: 1.3.2
 
 set -a
 BASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"

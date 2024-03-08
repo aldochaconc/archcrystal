@@ -29,6 +29,9 @@ echo "Partitioning Disk"
 sgdisk -n 1::+1M --typecode=1:ef02 --change-name=1:'BIOSBOOT' ${DISK}
 sgdisk -n 2::+1G --typecode=2:ef00 --change-name=2:'EFIBOOT' ${DISK}
 sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' ${DISK}
+
+# I'm adding a windows partition of 100G at the end of the disk
+sgdisk -n 4::-100G --typecode=4:8300 --change-name=4:'WINDOWS' ${DISK}
 if [[ ! -d "/sys/firmware/efi" ]]; then
     sgdisk -A 1:set:2 ${DISK}
 fi
@@ -56,16 +59,20 @@ subvolumesetup() {
     mountallsubvol
 }
 
+# In the configuration file, the options can be /dev/sda or /dev/nvme0n1
 if [[ ${DISK} =~ "nvme" ]]; then
     partition2=${DISK}p2
     partition3=${DISK}p3
+    partition3=${DISK}p4
 else
     partition2=${DISK}2
     partition3=${DISK}3
+    partition3=${DISK}4
 fi
 
 mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
 mkfs.ext4 -L ROOT ${partition3}
+mkfs.fat -F32 -n "WINDOWS" ${partition4}
 mount -t ext4 ${partition3} /mnt
 
 mkdir -p /mnt/boot/efi
