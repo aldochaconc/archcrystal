@@ -7,8 +7,6 @@ echo "Setting up Network"
 pacman -S --noconfirm --needed networkmanager dhclient ntp
 systemctl enable --now NetworkManager
 systemctl enable --now dhclient
-systemctl enable --now ntpd
-
 echo "Setting up Pacman"
 pacman -Sy archlinux-keyring
 
@@ -20,7 +18,6 @@ pacman -Sy --noconfirm --needed
 sed -i '35 i ILoveCandy' /etc/pacman.conf
 sed -i 's/#Color/Color/' /etc/pacman.conf
 systemctl enable paccache.timer
-systemctl enable trim.timer
 
 echo "Setting up compression settings"
 nc=$(grep -c ^processor /proc/cpuinfo)
@@ -40,7 +37,6 @@ locale-gen
 echo "LANG=en_US.UTF-8" >/etc/locale.conf
 echo "LC_TIME=en_US.UTF-8" >>/etc/locale.conf
 ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
-echo "KEYMAP=${KEYMAP}" >/etc/vconsole.conf
 
 # Add sudo no password rights
 sed -i 's/^# %wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
@@ -48,7 +44,7 @@ sed -i 's/^# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: A
 
 echo -ne "Pacstrapping Base System"
 
-pacman -S --noconfirm --needed mesa ibus man-db vim
+pacman -S --noconfirm --needed mesa man-db vim
 echo -ne "
 Installing Microcode
 "
@@ -64,26 +60,6 @@ elif grep -E "AuthenticAMD" <<<${proc_type}; then
     proc_ucode=amd-ucode.img
 fi
 
-echo -ne "
-
-Installing Graphics Drivers
-
-"
-# Graphics Drivers find and install
-gpu_type=$(lspci)
-echo "GPU Type: ${gpu_type}"
-if grep -E "NVIDIA|GeForce" <<<${gpu_type}; then
-    pacman -S --noconfirm --needed nvidia
-    nvidia-xconfig
-elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
-    pacman -S --noconfirm --needed xf86-video-amdgpu
-elif grep -E "Integrated Graphics Controller" <<<${gpu_type}; then
-    pacman -S --noconfirm --needed \
-        libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
-elif grep -E "Intel Corporation UHD" <<<${gpu_type}; then
-    pacman -S --needed --noconfirm \
-        libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
-fi
 
 #SETUP IS WRONG THIS IS RUN
 if ! source $HOME/archcrystal/setup.conf; then

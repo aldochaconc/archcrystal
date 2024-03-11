@@ -5,16 +5,10 @@ source $BASE_DIR/setup.conf
 pacman -Sy --noconfirm archlinux-keyring
 
 iso=$(curl -4 ifconfig.co/country-iso)
-timedatectl set-ntp true
 
 echo -ne "Enabling parallel downloads"
 pacman -S --noconfirm --needed pacman-contrib
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
-
-echo -ne "Setting up $iso mirrors for faster downloads"
-pacman -S --noconfirm --needed reflector rsync grub
-cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
-reflector -a 48 -c "$iso" -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
 mkdir /mnt &>/dev/null
 
 echo -ne "Formatting Disk"
@@ -31,7 +25,6 @@ sgdisk -n 2::+1G --typecode=2:ef00 --change-name=2:'EFIBOOT' ${DISK}
 sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' ${DISK}
 
 # I'm adding a windows partition of 100G at the end of the disk
-sgdisk -n 4::-100G --typecode=4:8300 --change-name=4:'WINDOWS' ${DISK}
 if [[ ! -d "/sys/firmware/efi" ]]; then
     sgdisk -A 1:set:2 ${DISK}
 fi
@@ -63,16 +56,12 @@ subvolumesetup() {
 if [[ ${DISK} =~ "nvme" ]]; then
     partition2=${DISK}p2
     partition3=${DISK}p3
-    partition3=${DISK}p4
 else
     partition2=${DISK}2
     partition3=${DISK}3
-    partition3=${DISK}4
-fi
 
 mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
 mkfs.ext4 -L ROOT ${partition3}
-mkfs.fat -F32 -n "WINDOWS" ${partition4}
 mount -t ext4 ${partition3} /mnt
 
 mkdir -p /mnt/boot/efi
@@ -91,7 +80,6 @@ pacstrap /mnt \
     base \
     base-devel \
     git \
-    libnewt \
     linux \
     linux-firmware \
     linux-headers \
@@ -99,8 +87,6 @@ pacstrap /mnt \
     vim \
     wget \
     pacman-contrib \
-    util-linux
-
 --noconfirm --needed
 
 cp -R ${BASE_DIR} /mnt/root/archcrystal
