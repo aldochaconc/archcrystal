@@ -23,32 +23,11 @@ RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 echo "Setting up Xorg server"
 pacman -S xorg-server xorg-server-utils xorg-xinit
+
 echo "Installing drivers"
 echo "GPU Type: ${gpu_type}"
 if grep -E "NVIDIA|GeForce" <<<${gpu_type}; then
 sudo pacman -S --noconfirm nvidia nvidia-utils nvidia-settings opencl-nvidia xorg-server-devel
-mkdir -p /etc/X11/xorg.conf.d
-cat >> /etc/X11/xorg.conf.d/10-nvidia-drm-outputclass.conf<<EOF
-Section "OutputClass"
-    Identifier "intel"
-    MatchDriver "i915"
-    Driver "modesetting"
-EndSection
-Section "OutputClass"
-    Identifier "nvidia"
-    MatchDriver "nvidia-drm"
-    Driver "nvidia"
-    Option "AllowEmptyInitialConfiguration"
-    Option "PrimaryGPU" "yes"
-    ModulePath "/usr/lib/nvidia/xorg"
-    ModulePath "/usr/lib/xorg/modules"
-EndSectionsudo nvidia-xconfig
-EOF
-mkdir -p /etc/modprobe.d
-cat >> /etc/modprobe.d/nvidia-drm-nomodeset.conf<<EOF
-options nvidia-drm modeset=1
-EOF
-sudo mkinitcpio -P
 elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
     sudo pacman -S --noconfirm --needed xf86-video-amdgpu
 elif grep -E "Integrated Graphics Controller" <<<${gpu_type}; then
