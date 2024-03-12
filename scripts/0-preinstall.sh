@@ -5,9 +5,10 @@ source $BASE_DIR/setup.conf
 pacman -Sy --noconfirm archlinux-keyring
 
 iso=$(curl -4 ifconfig.co/country-iso)
+timedatectl set-ntp true
 
 echo -ne "Enabling parallel downloads"
-pacman -S --noconfirm --needed pacman-contrib
+pacman -S --noconfirm --needed pacman-contrib reflector rsync grub
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 mkdir /mnt &>/dev/null
 
@@ -24,7 +25,6 @@ sgdisk -n 1::+1M --typecode=1:ef02 --change-name=1:'BIOSBOOT' ${DISK}
 sgdisk -n 2::+1G --typecode=2:ef00 --change-name=2:'EFIBOOT' ${DISK}
 sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' ${DISK}
 
-# I'm adding a windows partition of 100G at the end of the disk
 if [[ ! -d "/sys/firmware/efi" ]]; then
     sgdisk -A 1:set:2 ${DISK}
 fi
@@ -59,6 +59,7 @@ if [[ ${DISK} =~ "nvme" ]]; then
 else
     partition2=${DISK}2
     partition3=${DISK}3
+fi
 
 mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
 mkfs.ext4 -L ROOT ${partition3}
